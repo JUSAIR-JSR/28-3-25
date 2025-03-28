@@ -1,0 +1,8 @@
+
+<h2>Edit HR Staff: {{ hr.user.get_full_name }}</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" name="update_permissions" class="btn btn-primary">Save Changes</button>
+    <a href="{% url 'manage_hr_staff' %}" class="btn btn-secondary">Cancel</a>
+</form>

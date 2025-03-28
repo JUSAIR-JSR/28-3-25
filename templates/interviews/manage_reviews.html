@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Manage Reviews</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            text-align: center;
+            color: #007bff;
+        }
+        label {
+            font-weight: bold;
+        }
+        .rating {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: center;
+        }
+        .rating input {
+            display: none;
+        }
+        .rating label {
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24"><path fill="%23ccc" d="M12 .288l3.09 6.26 6.91 1.007-5 4.87 1.18 6.875-6.18-3.25-6.18 3.25L5 12.425l-5-4.87 6.91-1.007z"/></svg>') no-repeat;
+            background-size: contain;
+        }
+        .rating input:checked ~ label {
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24"><path fill="%23ff0" d="M12 .288l3.09 6.26 6.91 1.007-5 4.87 1.18 6.875-6.18-3.25-6.18 3.25L5 12.425l-5-4.87 6.91-1.007z"/></svg>') no-repeat;
+            background-size: contain;
+        }
+        .rating label:hover,
+        .rating label:hover ~ label {
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24"><path fill="%23ff0" d="M12 .288l3.09 6.26 6.91 1.007-5 4.87 1.18 6.875-6.18-3.25-6.18 3.25L5 12.425l-5-4.87 6.91-1.007z"/></svg>') no-repeat;
+            background-size: contain;
+        }
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .btn-container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+        .delete-btn {
+            background-color: #d9534f;
+        }
+        .delete-btn:hover {
+            background-color: #c9302c;
+        }
+    </style>
+</head>
+<body>
+
+    <a href="{% url 'add_interview_review' interview_id %}">back </a>
+
+    <div class="container">
+        <h1>Manage Reviews</h1>
+
+        <h2>Add Review Question</h2>
+        <form method="POST">
+            {% csrf_token %}
+            {{ question_form.as_p }}
+            <button type="submit" name="add_question">Add Question</button>
+        </form>
+
+        <h2>Review Questions</h2>
+        <ul>
+            {% for question in questions %}
+            <li>
+                <p>{{ question.question_text }}</p>
+                <div class="btn-container">
+                    <a href="{% url 'update_review_question' question.id %}" class="btn">Update Question</a>
+                    <a href="{% url 'delete_review_question' question.id %}?interview_id={{ interview_id }}" class="btn delete-btn">Delete Question</a>
+                </div>
+            </li>
+        {% endfor %}
+        
+        </ul>
+    </div>
+</body>
+</html>

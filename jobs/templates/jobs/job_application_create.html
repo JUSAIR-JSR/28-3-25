@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Apply for Job</title>
+</head>
+<body>
+    <h2>Apply for {{ job_posting.title }}</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <p><label for="cv">Upload your CV:</label>
+        {{ form.cv }}</p>
+        <button type="submit">Apply</button>
+    </form>
+    <a href="{% url 'user_dashboard' %}">Back to Dashboard</a>
+</body>
+</html>

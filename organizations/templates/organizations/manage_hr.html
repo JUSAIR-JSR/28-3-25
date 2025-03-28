@@ -1,0 +1,38 @@
+<h2>Manage HR Staff</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for hr in hr_staff %}
+        <tr>
+            <td>{{ hr.user.username }}</td>
+            <td>
+                {% if hr.user.email %}
+                    {{ hr.user.email }}
+                {% else %}
+                    <span class="text-muted">No email</span>
+                {% endif %}
+            </td>
+            <td>{{ hr.get_role_display }}</td>
+            <td>{% if hr.is_active %}Active{% else %}Inactive{% endif %}</td>
+            <td>
+                <a href="{% url 'manage_hr_staff' hr.id %}" class="btn btn-sm btn-info">Edit</a>
+                <form method="post" action="{% url 'manage_hr_staff' hr.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" name="toggle_active" class="btn btn-sm btn-warning">
+                        {% if hr.is_active %}Deactivate{% else %}Activate{% endif %}
+                    </button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a href="{% url 'add_hr_staff' %}" class="btn btn-primary">Add New HR</a>

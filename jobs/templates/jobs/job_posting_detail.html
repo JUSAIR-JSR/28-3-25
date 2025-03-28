@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Job Posting Detail</title>
+</head>
+<body>
+    <h2>{{ job_posting.title }}</h2>
+    <p>{{ job_posting.description }}</p>
+    <p><strong>Qualifications:</strong> {{ job_posting.required_qualifications }}</p>
+    <p><strong>Location:</strong> {{ job_posting.location }}</p>
+    <p><strong>Posted on:</strong> {{ job_posting.posted_on }}</p>
+    <p><strong>Application Deadline:</strong> {{ job_posting.application_deadline }}</p>
+    {% if job_posting.job_post_image %}
+        <p><img width="150" height="150" src="{{ job_posting.job_post_image.url }}" alt="{{ job_posting.title }}"></p>
+    {% endif %}
+    <h3>Applicants</h3>
+    <ul>
+        {% for application in applications %}
+            <li>
+                <a href="{% url 'user_profile' application.applicant.username %}">{{ application.applicant.username }}</a>
+                - {{ application.status }}
+            </li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'job_posting_list' org_id=organization.id %}">Back to Job Postings</a>
+</body>
+</html>

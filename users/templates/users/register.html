@@ -1,0 +1,72 @@
+{% extends 'style.html' %}
+{% block content %}
+
+<style>
+    body{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .container h2{
+        text-align: center;
+    }
+
+    form{
+        display: grid;
+    }
+    form p{
+        display: grid;
+    }
+    form p input{
+            height: 2rem;
+            border: none;
+            border-bottom: 4px dashed whitesmoke;
+            outline: none;
+            font-size: 1.3rem;
+        }
+        form button{
+            height: 3rem;
+            margin-top: 2rem;
+            font-size: 1.3rem;
+            border: none;
+            border-radius: .5rem;
+            outline: none;
+            background: #5f37e0;
+            color: white;
+
+        }
+        .btn{
+            /* border: 2px solid red; */
+            margin-top: 2rem;
+            display: flex;
+            justify-content: space-between;
+        }
+        .btn button{
+            font-size: 1rem;
+            border: none;
+            height: 2rem;
+            width: 10rem;
+            border-radius: .5rem;
+            outline: none;
+
+        }
+</style>
+
+    <div class="container">
+    <h2>User Registration</h2>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div>
+            <label for="email">Email:</label>
+            <input type="email" name="email" id="email" required>
+        </div>
+        <button type="submit">Register</button>
+    </form>
+    <div class="btn">
+    <a href="{% url 'user_login' %}"><button>login</button></a>
+    </div>
+    </div>
+    {% endblock content %}
+
+

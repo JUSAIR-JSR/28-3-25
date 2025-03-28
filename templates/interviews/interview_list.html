@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Interview List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 0;
+            text-align: center;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #007bff;
+            margin-top: 20px;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+            width: 100%;
+            margin: 20px auto;
+        }
+        li {
+            background: #fff;
+            margin: 10px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .btn {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            margin-top: 10px;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .btn-container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+        .delete-btn {
+            background-color: #d9534f;
+        }
+        .delete-btn:hover {
+            background-color: #c9302c;
+        }
+        .star{
+            color: #f18c00;
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <button class="btn-back" onclick="window.location.href = 'http://127.0.0.1:8000/organizations/dashboard/';">Back js</button>
+
+    <header>
+        <h2>Interview List</h2>
+    </header>
+    <div class="container">
+        <a href="{% url 'create_interview' %}">create interview</a>
+        <ul>
+            {% for item in interviews_with_reviews %}
+                <li>
+                    <p>Job: {{ item.interview.job_application.job.title }}</p>
+                    <p>Applicant: {{ item.interview.job_application.applicant.username }}</p>
+                    <p>Scheduled Time: {{ item.interview.scheduled_time }}</p>
+                    <p>Interview Link: <a href="{{ item.interview.interview_link }}" target="_blank">{{ item.interview.interview_link }}</a></p>
+                    <h3>Reviews</h3>
+                    {% for review in item.reviews %}
+                        <div>
+                            <p>Question: {{ review.question.question_text }}</p>
+                            <p>Rating: {{ review.rating }}<span class="star">★</span></p>
+                        </div>
+                    {% endfor %}
+                    <div class="btn-container">
+                        <a href="{% url 'interview_detail' item.interview.id %}" class="btn">View Interview</a>
+                        <a href="{% url 'update_interview' item.interview.id %}" class="btn">Update Interview</a>
+                        <a href="{% url 'delete_interview' item.interview.id %}" class="btn delete-btn">Delete Interview</a>
+                    </div>
+                </li>
+            {% endfor %}
+            {% if not interviews_with_reviews %}
+                <li>No scheduled interviews.</li>
+            {% endif %}
+        </ul>
+    </div>
+</body>
+</html>

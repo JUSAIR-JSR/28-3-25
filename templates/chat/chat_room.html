@@ -1,0 +1,135 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat Room</title>
+    <link
+    href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css"
+    rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{% static 'css/chat_room.css' %}">
+</head>
+<body>
+
+    <h1>Chat with {{ other_participant.username }}</h1>
+    
+    <div id="chat-box">
+        <div class="btnchat">
+            <button class="btn-back" onclick="history.back()"><i class="ri-arrow-left-line"></i></button>
+        </div>
+        <div class="messages-container">
+            {% for message in messages %}
+                <div class="message {% if message.sender == request.user %}sent{% else %}received{% endif %}" data-message-id="{{ message.id }}">
+                    <span class="message-text">{{ message.text }}</span>
+                    <span class="timestamp">{{ message.timestamp|date:"H:i" }}</span>
+
+                    {% if message.sender == request.user %}
+                        <!-- Three-dot Menu -->
+                        <div class="menu-container">
+                            <button class="menu-btn" onclick="toggleMenu(this)">⋮</button>
+                            <div class="message-actions hidden">
+                                <button class="text-btn edit-btn" onclick="editMessage(this)"><i class="ri-pencil-line"></i>Edit</button>
+                                <form method="POST" class="delete-form">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="hidden" name="message_id" value="{{ message.id }}">
+                                    <button class="text-btn" type="submit"><i class="ri-delete-bin-6-line"></i>Delete</button>
+                                </form>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+        
+        <form method="POST" class="chat-input">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="send">
+            <input type="text" name="message" placeholder="Type a message">
+            <button type="submit"><i class="ri-send-plane-2-fill"></i></button>
+        </form>
+    </div>
+
+    <script>
+     function editMessage(button) {
+    let messageDiv = button.closest('.message');
+    let messageText = messageDiv.querySelector('.message-text');
+    let messageId = messageDiv.getAttribute('data-message-id');
+
+    let originalText = messageText.textContent; // Store original text
+
+    let inputField = document.createElement('input');
+    inputField.type = 'text';
+    inputField.value = originalText;
+    inputField.classList.add('edit-input');
+
+    messageText.replaceWith(inputField);
+    inputField.focus();
+
+    // Close the menu when editing starts
+    let menu = messageDiv.querySelector('.message-actions');
+    if (menu) {
+        menu.classList.add('hidden');
+    }
+
+    function revertEdit() {
+        let newSpan = document.createElement('span');
+        newSpan.classList.add('message-text');
+        newSpan.textContent = originalText;
+        inputField.replaceWith(newSpan);
+        document.removeEventListener('click', handleBlur);
+    }
+
+    function handleBlur(event) {
+        if (!event.target.closest('.edit-input') && !event.target.closest('.menu-btn')) {
+            revertEdit();
+        }
+    }
+
+    inputField.addEventListener('keypress', function (event) {
+        if (event.key === 'Enter') {
+            saveEditedMessage(inputField, messageId);
+            document.removeEventListener('click', handleBlur);
+        }
+    });
+
+    setTimeout(() => {
+        document.addEventListener('click', handleBlur);
+    }, 100); // Delay to prevent immediate hiding
+}
+
+function toggleMenu(button) {
+    let menu = button.nextElementSibling;
+    let allMenus = document.querySelectorAll('.message-actions');
+
+    // Close all other menus before opening a new one
+    allMenus.forEach(m => {
+        if (m !== menu) {
+            m.classList.add('hidden');
+        }
+    });
+
+    // Toggle menu visibility
+    menu.classList.toggle('hidden');
+
+    // Prevent immediate hiding when clicking the menu button
+    setTimeout(() => {
+        document.addEventListener('click', closeMenus);
+    }, 100);
+}
+
+function closeMenus(event) {
+    if (!event.target.closest('.menu-btn') && !event.target.closest('.message-actions')) {
+        document.querySelectorAll('.message-actions').forEach(menu => {
+            menu.classList.add('hidden');
+        });
+        document.removeEventListener('click', closeMenus);
+    }
+}
+
+
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Delete Job Posting</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        h2 {
+            text-align: center;
+            color: #ff0000;
+            margin-top: 20px;
+        }
+        .container {
+            width: 50%;
+            margin: 0 auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .container p {
+            font-size: 18px;
+            margin: 20px 0;
+        }
+        .btn-group {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+        button {
+            background-color: #ff0000;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #cc0000;
+        }
+        .cancel-btn {
+            background-color: #007bff;
+        }
+        .cancel-btn:hover {
+            background-color: #0056b3;
+        }
+        .btn a {
+            text-decoration: none;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Delete Job Posting</h2>
+        <p>Are you sure you want to delete the job posting "{{ job_posting.title }}"?</p>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="btn-group">
+                <button type="submit">Yes, Delete</button>
+            </div>
+        </form>
+        <button class="cancel-btn"><a href="{% url 'job_posting_list' org_id=organization.id %}">Cancel</a></button>
+    </div>
+</body>
+</html>

@@ -1,0 +1,129 @@
+{% load user_filters %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        h2, h3 {
+            text-align: center;
+            color: #007bff;
+            margin-top: 20px;
+        }
+        .btn {
+            text-align: center;
+            margin: 20px;
+        }
+        .btn a {
+            text-decoration: none;
+        }
+        .btn button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .btn button:hover {
+            background-color: #0056b3;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+            width: 80%;
+            margin: 20px auto;
+        }
+        li {
+            background: #fff;
+            margin: 10px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s ease-in-out;
+        }
+        li:hover {
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+            margin-right: 10px;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .job-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .profile-links {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin: 20px;
+        }
+        .profile-links a {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+        }
+        .profile-links a:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    
+    <h3>Available Job Postings</h3>
+    <ul>
+        {% for job in job_postings %}
+            <li>
+                {% if job.job_post_image %}
+                    <p><img class="job-image" width="250" src="{{ job.job_post_image.url }}" alt="{{ job.title }}"></p>
+                {% endif %}
+                <strong>{{ job.title }}</strong> - {{ job.organization.name }} - {{ job.location }}
+                <p>{{ job.description }}</p>
+                <p><strong>Qualifications:</strong> {{ job.required_qualifications }}</p>
+                <p><strong>Posted on:</strong> {{ job.posted_on }}</p>
+                <p><strong>Application Deadline:</strong> {{ job.application_deadline }}</p>
+                <div class="btn">
+                    {% if job.id in applied_jobs %}
+                        <p><strong>Status:</strong> {{ applied_jobs|dictkey:job.id }}</p>
+                    {% else %}
+                        <a href="{% url 'job_application_create' job.pk %}">
+                            <button>Apply</button>
+                        </a>
+                    {% endif %}
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <h2>Manage Your Profile</h2>
+    <div class="profile-links">
+        <a href="{% url 'profile_view' %}">View Profile</a>
+        <a href="{% url 'profile_image_update' %}">Update Profile Image</a>
+        <a href="{% url 'banner_image_update' %}">Update Banner Image</a>
+        <a href="{% url 'skills_select' %}">Manage Skills</a>
+        <a href="{% url 'personal_details_update' %}">Update Personal Details</a>
+        <a href="{% url 'user_job_applications' %}">View Job Applications</a>
+        <a href="{% url 'notifications' %}">View Notifications</a>
+        <a href="{% url 'user_logout' %}">Logout</a>
+    </div>
+</body>
+</html>

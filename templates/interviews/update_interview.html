@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Update Interview</title>
+</head>
+<body>
+    <button class="btn-back" onclick="window.location.href = 'http://127.0.0.1:8000/interviews/list/';">Back js</button>
+
+    <h1>Update Interview for {{ interview.job_application.job.title }}</h1>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Update Interview</button>
+    </form>
+</body>
+</html>

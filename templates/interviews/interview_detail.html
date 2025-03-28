@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Interview Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #007bff;
+            text-align: center;
+        }
+        p, div {
+            margin: 10px 0;
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .btn {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            margin-top: 10px;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .btn-container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+        .delete-btn {
+            background-color: #d9534f;
+        }
+        .delete-btn:hover {
+            background-color: #c9302c;
+        }
+      .star{
+            color: #f18c00;
+            font-size: 1.5rem;
+        }  
+    </style>
+</head>
+<body>
+    
+    <button class="btn-back" onclick="window.location.href = 'http://127.0.0.1:8000/interviews/list/';">Back js</button>
+    <div class="container">
+        <h1>Interview Details</h1>
+        <p>Job: {{ interview.job_application.job.title }}</p>
+        <p>Applicant: {{ interview.job_application.applicant.username }}</p>
+        <p>Scheduled Time: {{ interview.scheduled_time }}</p>
+        <p>Interview Link: <a href="{{ interview.interview_link }}" target="_blank">{{ interview.interview_link }}</a></p>
+        
+        <h2>Reviews</h2>
+        {% for review in reviews %}
+            <div>
+                <p>Question: {{ review.question.question_text }}</p>
+                <p>Rating: {{ review.rating }}<span class="star">★</span></p>
+            </div>
+        {% endfor %}
+
+        <div class="btn-container">
+            <a href="{% url 'add_interview_review' interview.id %}" class="btn">Add Interview Review</a>
+        </div>
+    </div>
+</body>
+</html>
+

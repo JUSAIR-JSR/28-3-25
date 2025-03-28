@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ user_profile.username }}'s Profile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .btn{
+            background: #23c1ff;
+            color: black;
+            height: 1.7rem;
+            border: none;
+            margin-left: 3rem;
+            border-radius: 1.5rem;
+            
+        }
+        .container {
+            width: 90%;
+            margin: 0 auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .profile-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .profile-info {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .profile-info div {
+            margin-right: 20px;
+        }
+        .profile-info img {
+            border-radius: 50%;
+            width: 150px;
+            height: 150px;
+        }
+        .sections {
+            display: flex;
+            justify-content: space-between;
+        }
+        .section {
+            width: 48%;
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        h2, h3, h4 {
+            color: #007bff;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            background: #fafafa;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            transition: box-shadow 0.3s ease-in-out;
+        }
+        li:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        
+        .star {
+            color: #ff6f00;
+            font-size: 1.3rem;
+        }
+        
+    </style>
+</head>
+<body>
+    <a href="{% url 'manage_job_applications' %}"><button class="btn">Back to Job Applications</button></a>
+
+    <div class="container">
+        <div class="profile-header">
+            <h2>{{ user_profile.username }}'s Profile</h2>
+        </div>
+        <div class="profile-info">
+            <div>
+                <p><strong>Username:</strong> {{ user_profile.username }}</p>
+                <p><strong>Email:</strong> {{ user_profile.email }}</p>
+            </div>
+            {% if user_profile.profile.profile_image %}
+                <div>
+                    <img src="{{ user_profile.profile.profile_image.url }}" alt="{{ user_profile.username }}">
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="sections">
+            <div class="section">
+                <h3>Job Applications</h3>
+                <ul>
+                    {% for application in applications %}
+                        <li>
+                            <p><strong>Job:</strong> {{ application.job.title }}</p>
+                            <p><strong>Status:</strong> {{ application.status }}</p>
+                            {% if application.cv %}
+                                <p><strong>CV:</strong> <a href="{{ application.cv.url }}" target="_blank">Download CV</a></p>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            
+            <div class="section">
+                <h3>Interview Reviews</h3>
+                <ul>
+                    {% for application in applications %}
+                        <li>
+                            <p><strong>Job:</strong> {{ application.job.title }}</p>
+                            <h4>Reviews</h4>
+                            <ul>
+                                {% for review in reviews %}
+                                    {% if review.interview.job_application == application %}
+                                        <li>
+                                            <p><strong>Question:</strong> {{ review.question.question_text }}</p>
+                                            <p><strong>Rating:</strong> 
+                                                <span>{{ review.rating }}<span class="star">★</span></span>
+                                            </p>
+                                            <p><strong>Reviewed At:</strong> {{ review.created_at|date:"b. d, Y, P" }}</p>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

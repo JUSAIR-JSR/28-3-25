@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Your Job Applications</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        h2 {
+            text-align: center;
+            color: #007bff;
+            margin-top: 20px;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+            width: 80%;
+            margin: 20px auto;
+        }
+        li {
+            background: #fff;
+            margin: 10px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s ease-in-out;
+        }
+        li:hover {
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+            margin-right: 10px;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h2>Your Job Applications</h2>
+    <ul>
+        {% for application in applications %}
+            <li>
+                <strong>{{ application.job.title }}</strong> - {{ application.job.organization.name }}
+                <p><strong>Applied on:</strong> {{ application.applied_on }}</p>
+                <p><strong>Status:</strong> {{ application.status }}</p>
+                {% if application.cv %}
+                    <p><strong>CV:</strong> <a href="{{ application.cv.url }}">Download CV</a></p>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'user_dashboard' %}">Back to Dashboard</a>
+</body>
+</html>

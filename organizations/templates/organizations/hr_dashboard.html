@@ -1,0 +1,150 @@
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ current_org.name }} HR Dashboard</title>
+    {% tailwind_css %}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .hover-scale {
+            transition: transform 0.2s ease;
+        }
+        .hover-scale:hover {
+            transform: scale(1.02);
+        }
+        .shadow-soft {
+            box-shadow: 0 4px 20px -1px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+
+    <div class="container mx-auto px-4 py-6">
+        <!-- Organization Switcher -->
+        {% if hr_organizations|length > 1 %}
+        <div class="mb-6 p-4 bg-white rounded-lg shadow">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Currently viewing:</label>
+            <div class="flex flex-wrap gap-2">
+                {% for org in hr_organizations %}
+                <a href="{% url 'hr_dashboard' org.id %}" 
+                   class="px-4 py-2 rounded-full text-sm font-medium 
+                          {% if org.id == current_org.id %}
+                          bg-blue-100 text-blue-800
+                          {% else %}
+                          bg-gray-100 text-gray-800 hover:bg-gray-200
+                          {% endif %}">
+                   {{ org.name }}
+                   {% if org.id == current_org.id %}(Active){% endif %}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    
+        <!-- Dashboard Header -->
+        <div class="mb-6 flex justify-between items-center">
+            <h1 class="text-2xl font-bold">
+                <span class="text-blue-600">{{ current_org.name }}</span> HR Dashboard
+            </h1>
+            <div class="badge bg-blue-100 text-blue-800">
+                {{ hr_role.get_role_display }}
+            </div>
+        </div>
+    
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h3 class="text-gray-500 text-sm">Job Postings</h3>
+                <p class="text-2xl font-bold">{{ job_postings.count }}</p>
+                {% if can_post_jobs %}
+                <a href="{% url 'job_posting_create' current_org.id %}" class="text-sm text-blue-600 hover:underline">
+                    Create New
+                </a>
+                {% endif %}
+            </div>
+            
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h3 class="text-gray-500 text-sm">Applications</h3>
+                <p class="text-2xl font-bold">{{ applications.count }}</p>
+                {% if can_manage_applications %}
+                <a href="{% url 'manage_job_applications' current_org.id %}" class="text-sm text-blue-600 hover:underline">
+                    Manage
+                </a>
+                {% endif %}
+            </div>
+            
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h3 class="text-gray-500 text-sm">Interviews</h3>
+                <p class="text-2xl font-bold">{{ interviews.count }}</p>
+                {% if can_schedule_interviews %}
+                <a href="#" class="text-sm text-blue-600 hover:underline">
+                    Schedule
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    
+        <!-- Recent Job Postings -->
+        <div class="bg-white p-6 rounded-lg shadow mb-8">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold">Recent Job Postings</h2>
+                <a href="{% url 'job_posting_list' current_org.id %}" class="text-blue-600 hover:underline">
+                    View All
+                </a>
+            </div>
+            
+            {% if job_postings %}
+            <div class="space-y-4">
+                {% for job in job_postings|slice:":5" %}
+                <div class="border-b pb-4 last:border-0 last:pb-0">
+                    <h3 class="font-medium">{{ job.title }}</h3>
+                    <div class="text-sm text-gray-600">
+                        <span>{{ job.applications.count }} applications</span> • 
+                        <span>Posted {{ job.posted_on|date:"M d" }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-gray-500">No job postings yet</p>
+            {% endif %}
+        </div>
+    
+        <!-- Quick Actions -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {% if can_post_jobs %}
+            <a href="{% url 'job_posting_create' current_org.id %}" 
+               class="p-4 bg-white rounded-lg shadow hover:shadow-md transition flex items-center">
+                <div class="bg-blue-100 p-3 rounded-full mr-4">
+                    📝
+                </div>
+                <div>
+                    <h3 class="font-medium">Create Job Posting</h3>
+                    <p class="text-sm text-gray-600">Post a new job opportunity</p>
+                </div>
+            </a>
+            {% endif %}
+            
+            {% if can_manage_applications %}
+            <a href="{% url 'manage_job_applications' current_org.id %}" 
+               class="p-4 bg-white rounded-lg shadow hover:shadow-md transition flex items-center">
+                <div class="bg-green-100 p-3 rounded-full mr-4">
+                    👥
+                </div>
+                <div>
+                    <h3 class="font-medium">Manage Applications</h3>
+                    <p class="text-sm text-gray-600">Review candidate applications</p>
+                </div>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

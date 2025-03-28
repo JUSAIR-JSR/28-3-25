@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>View User Profile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h2 {
+            color: #333;
+            text-align: center;
+            margin-top: 0;
+        }
+        .profile-section {
+            margin-bottom: 20px;
+        }
+        .profile-section img {
+            display: block;
+            margin: 0 auto;
+            border-radius: 50%;
+            object-fit: cover;
+            
+        }
+        .profile-section p {
+            font-size: 16px;
+            color: #666;
+            text-align: center;
+        }
+        .profile-section p strong {
+            color: #333;
+        }
+        .profile-links {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .profile-links a {
+            text-decoration: none;
+            color: #007bff;
+            margin-right: 10px;
+        }
+        .profile-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>User Profile</h2>
+        <div class="profile-section">
+            <p><strong>Profile Image:</strong>
+                {% if profile.profile_image %}
+                    <img width="150" height="150" src="{{ profile.profile_image.url }}" alt="Profile Image">
+                {% else %}
+                    No profile image available.
+                {% endif %}
+            </p>
+        </div>
+        <div class="profile-section">
+            <p><strong>Banner Image:</strong>
+                {% if profile.banner_image %}
+                    <img width="550" height="250" src="{{ profile.banner_image.url }}" alt="Banner Image">
+                {% else %}
+                    No banner image available.
+                {% endif %}
+            </p>
+        </div>
+        <div class="profile-section">
+            <p><strong>Certifications:</strong> {{ profile.certifications }}</p>
+        </div>
+        <div class="profile-section">
+            <p><strong>Qualifications:</strong> {{ profile.qualifications }}</p>
+        </div>
+        <div class="profile-section">
+            <p><strong>Skills:</strong> {{ profile.skills.all|join:", " }}</p>
+        </div>
+        <div class="profile-section">
+            <p><strong>Location:</strong> {{ profile.location }}</p>
+        </div>
+        <div class="profile-links">
+            <a href="{% url 'profile_image_update' %}">Edit Profile Image</a>
+            <a href="{% url 'banner_image_update' %}">Edit Banner Image</a>
+            <a href="{% url 'skills_select' %}">Edit Skills</a>
+            <a href="{% url 'personal_details_update' %}">Edit Personal Details</a>
+            <a href="{% url 'user_dashboard' %}">Back to home</a>
+
+        </div>
+    </div>
+</body>
+</html>

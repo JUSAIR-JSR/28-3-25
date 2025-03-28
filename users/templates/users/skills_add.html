@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add New Skill</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        h2, h3 {
+            color: #333;
+        }
+        .skill-section {
+            margin-bottom: 20px;
+        }
+        .skill-input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 8px;
+            box-sizing: border-box;
+        }
+        .submit-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .submit-button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h2>Add New Skill</h2>
+    <form method="POST" action="{% url 'skills_add' %}">
+        {% csrf_token %}
+        
+        <div class="skill-section">
+            <h3>New Skill</h3>
+            <input type="text" name="new_skill" id="new_skill" placeholder="Enter new skill" class="skill-input">
+        </div>
+        
+        <button type="submit" class="submit-button">Add Skill</button>
+    </form>
+    <a href="{% url 'skills_select' %}">Select Skills</a>
+</body>
+</html>

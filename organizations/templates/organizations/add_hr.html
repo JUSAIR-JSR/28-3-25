@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add HR Staff</title>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        select, input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .error {
+            color: red;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        .btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        .btn:hover {
+            opacity: 0.9;
+        }
+        .select2-container {
+            width: 100% !important;
+        }
+        #username-display {
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Add HR Staff</h2>
+        <form method="post" id="hr-form">
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+                <div class="error">{{ form.non_field_errors }}</div>
+            {% endif %}
+            
+            <div class="form-group">
+                <label for="user-search">Username</label>
+                <select id="user-search" class="js-user-search" style="width: 100%">
+                    {% if form.user.value %}
+                        <option value="{{ form.user.value }}" selected>{{ form.username_display.value }}</option>
+                    {% endif %}
+                </select>
+                {{ form.user }}
+                {{ form.username_display }}
+                {% if form.user.errors %}
+                    <div class="error">{{ form.user.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="id_role">Role</label>
+                {{ form.role }}
+                {% if form.role.errors %}
+                    <div class="error">{{ form.role.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label>Permissions:</label>
+                <div>
+                    {{ form.can_post_jobs }}
+                    <label for="{{ form.can_post_jobs.id_for_label }}">Can Post Jobs</label>
+                </div>
+                <div>
+                    {{ form.can_manage_applications }}
+                    <label for="{{ form.can_manage_applications.id_for_label }}">Can Manage Applications</label>
+                </div>
+                <div>
+                    {{ form.can_schedule_interviews }}
+                    <label for="{{ form.can_schedule_interviews.id_for_label }}">Can Schedule Interviews</label>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn">Add HR</button>
+            <a href="{% url 'manage_hr_staff' %}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+    $(document).ready(function() {
+        // Initialize Select2
+        $('#user-search').select2({
+            placeholder: "Search for a user...",
+            ajax: {
+                url: "{% url 'user_search' %}",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        term: params.term
+                    };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.results
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 1
+        });
+        
+        // Update hidden fields when selection changes
+        $('#user-search').on('change', function() {
+            var data = $(this).select2('data');
+            if (data && data[0]) {
+                $('#id_user').val(data[0].id);
+                $('#id_username_display').val(data[0].text);
+            }
+        });
+        
+        // Initialize form with existing values
+        {% if form.user.value %}
+            $('#id_username_display').val('{{ form.username_display.value }}');
+        {% endif %}
+    });
+    </script>
+</body>
+</html>

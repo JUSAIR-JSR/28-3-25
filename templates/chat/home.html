@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat Home</title>
+    {% load static %}
+    <link  href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="{% static 'css/chat_home.css' %}">
+</head>
+<body>
+    <div class="btnchat"> 
+        <button class="btn-back" onclick="history.back()"><i class="ri-arrow-left-line"></i></button>
+    </div>
+
+
+    <h1>Chat Home</h1>
+
+    <!-- Search Bar -->
+    <form method="GET" action="{% url 'chat_home' %}" class="search-container">
+        <input type="text" name="query" placeholder="Search users" value="{{ query }}" class="search-input">
+        <button type="submit" class="search-button"><i class="ri-search-2-line"></i></button>
+    </form>
+
+    <!-- Users List -->
+    <div class="list-container">
+        <div class="list-title">Users</div>
+        <ul class="user-list">
+            {% for user in users %}
+                <li class="list-item">
+                    <a href="{% url 'chat_room' user.username %}" class="user-link">{{ user.username }}</a>
+                </li>
+            {% empty %}
+                <li class="list-item">No users found <i class="ri-crosshair-2-line"></i></li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Conversations List -->
+    <div class="list-container">
+        <div class="list-title">Conversations</div>
+        <ul class="conversation-list">
+            {% for item in conversations %}
+                <li class="list-item {% if item.has_unread_messages %} unread {% endif %}">
+                    <a href="{% url 'chat_room' item.other_participant.username %}" class="user-link">
+                        <img src="{{ item.other_participant.profile_image_url }}" alt="{{ item.other_participant.username }}" class="profile-image">
+                        {{ item.other_participant.username }}
+                    </a>
+                    <form method="POST" action="{% url 'chat_home' %}" class="delete-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="conversation_id" value="{{ item.conversation.id }}">
+                        <button type="submit" class="delete-button"><i class="ri-delete-bin-6-line"></i></button>
+                    </form>
+                </li>
+            {% empty %}
+                <li class="list-item">No conversations found <i class="ri-crosshair-2-line"></i></li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>

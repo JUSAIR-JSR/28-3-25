@@ -1,0 +1,496 @@
+{% load static tailwind_tags %}
+
+<!doctype html>
+<html lang="en">
+  <head>
+    {% tailwind_css %}
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.12.0/dist/cdn.min.js" defer></script>
+    
+    <style>
+        /* Smooth gradient animation */
+        @keyframes gradientFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        /* Floating animation */
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        /* Background shape animation */
+        @keyframes shapeRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Modern text gradient */
+        .gradient-text {
+            background: linear-gradient(90deg, #4f46e5, #7c3aed);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        /* Glass morphism effect */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        }
+        
+        /* Animated background element */
+        .animated-bg-element {
+            background: linear-gradient(-45deg, #e0e7ff, #a5b4fc, #e0e7ff, #a5b4fc);
+            background-size: 400% 400%;
+            animation: gradientFlow 15s ease infinite;
+        }
+        
+        /* Floating animation class */
+        .animate-floating {
+            animation: floating 6s ease-in-out infinite;
+        }
+        
+        /* Rotating shape */
+        .animate-shape-rotate {
+            animation: shapeRotate 60s linear infinite;
+        }
+        
+        /* Hover scale effect */
+        .hover-scale {
+            transition: transform 0.3s ease;
+        }
+        .hover-scale:hover {
+            transform: scale(1.03);
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.05);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0,0,0,0.2);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0,0,0,0.3);
+        }
+        
+        /* Particle animation */
+        @keyframes particleMove {
+            0% { transform: translateY(0) translateX(0); opacity: 1; }
+            100% { transform: translateY(-100vh) translateX(100px); opacity: 0; }
+        }
+        .particle {
+            position: absolute;
+            background: rgba(79, 70, 229, 0.3);
+            border-radius: 50%;
+            animation: particleMove linear infinite;
+        }
+    </style>
+</head>
+<body class="font-['Inter'] bg-gradient-to-br from-blue-50 to-indigo-50 text-gray-800 overflow-x-hidden" x-data="{ mobileMenuOpen: false }">
+    <!-- Background Elements -->
+    <div class="fixed inset-0 overflow-hidden -z-50">
+        <!-- Animated gradient background -->
+        <div class="absolute inset-0 animated-bg-element opacity-30"></div>
+        
+        <!-- Floating particles -->
+        <div id="particles-container"></div>
+        
+        <!-- Animated shapes -->
+        <div class="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-indigo-100 opacity-20 filter blur-xl animate-floating"></div>
+        <div class="absolute top-1/3 right-1/4 w-80 h-80 rounded-lg bg-purple-100 opacity-20 filter blur-xl animate-floating animation-delay-2000"></div>
+        <div class="absolute bottom-1/4 right-1/3 w-72 h-72 rounded-full bg-blue-100 opacity-20 filter blur-xl animate-floating animation-delay-4000"></div>
+        
+        <!-- Rotating abstract shape -->
+        <div class="absolute top-1/2 left-1/4 w-96 h-96 opacity-10 animate-shape-rotate">
+            <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <path fill="#7C3AED" d="M45.7,-65.2C58.7,-56.8,68.8,-42.9,74.6,-27.1C80.3,-11.3,81.7,6.4,76.4,22.4C71.1,38.4,59.1,52.7,44.1,62.7C29.1,72.7,11.1,78.4,-5.3,83.1C-21.7,87.8,-43.4,91.5,-58.1,82.8C-72.8,74.1,-80.5,53,-82.1,32.6C-83.7,12.2,-79.2,-7.5,-70.2,-23.9C-61.2,-40.3,-47.7,-53.4,-33.3,-61.3C-18.9,-69.2,-3.6,-71.9,11.8,-82.3C27.2,-92.7,54.4,-110.9,65.1,-102.8C75.8,-94.7,70,-60.4,65.2,-39.3C60.4,-18.3,56.5,-10.6,56.2,-3.1C55.9,4.4,59.1,8.8,58.1,15.1C57.1,21.4,51.9,29.6,45.1,41.2C38.3,52.8,29.9,67.8,17.3,76.4C4.7,85,-12.1,87.3,-25.5,81.5C-38.9,75.7,-48.9,61.9,-60.5,48.3C-72.1,34.7,-85.3,21.3,-89.2,5.3C-93.1,-10.7,-87.7,-29.3,-76.3,-43.6C-64.9,-57.9,-47.5,-67.9,-31.8,-74.9C-16.1,-81.9,-2.1,-85.9,12.9,-77.2C27.9,-68.5,55.8,-47.1,62.6,-27.1C69.4,-7.1,55.1,11.5,45.7,-65.2Z" transform="translate(100 100)" />
+            </svg>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="relative z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center shadow-md">
+                            <i class="fas fa-chart-line text-white text-lg"></i>
+                        </div>
+                        <span class="text-xl font-bold text-indigo-800">intelliCity</span>
+                    </div>
+                </div>
+                
+                <!-- Desktop Menu -->
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-center space-x-4">
+                        <a href="#" class="px-3 py-2 rounded-md text-sm font-medium text-indigo-700 hover:text-indigo-900 transition-colors">Features</a>
+                        <a href="#" class="px-3 py-2 rounded-md text-sm font-medium text-indigo-700 hover:text-indigo-900 transition-colors">Solutions</a>
+                        <a href="#" class="px-3 py-2 rounded-md text-sm font-medium text-indigo-700 hover:text-indigo-900 transition-colors">Pricing</a>
+                        <a href="#" class="px-3 py-2 rounded-md text-sm font-medium text-indigo-700 hover:text-indigo-900 transition-colors">Resources</a>
+                    </div>
+                </div>
+                
+                <!-- Auth Buttons -->
+                <div class="hidden md:flex items-center space-x-4">
+                    <a href="{% url 'user_login' %}" class="px-4 py-2 rounded-md text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors">
+                        Sign In
+                    </a>
+                    <a href="{% url 'organization_login' %}" class="px-4 py-2 rounded-md text-sm font-medium bg-gradient-to-br from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-indigo-500/20">
+                        Get Started
+                    </a>
+                </div>
+                
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button @click="mobileMenuOpen = !mobileMenuOpen" class="inline-flex items-center justify-center p-2 rounded-md text-indigo-600 hover:text-indigo-800 hover:bg-indigo-100 focus:outline-none">
+                        <i class="fas fa-bars" x-show="!mobileMenuOpen"></i>
+                        <i class="fas fa-times" x-show="mobileMenuOpen"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div class="md:hidden" x-show="mobileMenuOpen" x-transition:enter="transition ease-out duration-100 transform"
+             x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
+             x-transition:leave="transition ease-in duration-75 transform"
+             x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 glass-card rounded-lg mx-4 mt-2 shadow-xl">
+                <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-indigo-700 hover:text-indigo-900 hover:bg-indigo-50 transition-colors">Features</a>
+                <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-indigo-700 hover:text-indigo-900 hover:bg-indigo-50 transition-colors">Solutions</a>
+                <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-indigo-700 hover:text-indigo-900 hover:bg-indigo-50 transition-colors">Pricing</a>
+                <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-indigo-700 hover:text-indigo-900 hover:bg-indigo-50 transition-colors">Resources</a>
+                <div class="pt-2 border-t border-indigo-100">
+                    <a href="{% url 'user_login' %}" class="block px-3 py-2 rounded-md text-base font-medium text-indigo-600 hover:text-indigo-800 transition-colors">Sign In</a>
+                    <a href="{% url 'organization_login' %}" class="block px-3 py-2 rounded-md text-base font-medium bg-gradient-to-br from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 transition-all mt-2 text-center">
+                        Get Started
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="relative isolate overflow-hidden pt-16 pb-24 sm:pt-24">
+        <div class="mx-auto max-w-7xl px-6 lg:px-8">
+            <div class="mx-auto max-w-2xl lg:mx-0 lg:grid lg:max-w-none lg:grid-cols-2 lg:gap-x-16 lg:gap-y-6">
+                <div class="lg:pr-8 lg:pt-6">
+                    <!-- Announcement Badge -->
+                    <div class="inline-flex items-center rounded-full px-4 py-1.5 text-sm font-medium text-indigo-700 bg-indigo-100 ring-1 ring-indigo-200 mb-6 animate__animated animate__fadeIn">
+                        <span class="h-2 w-2 rounded-full bg-indigo-500 animate-pulse mr-2"></span>
+                        Introducing our new analytics suite
+                        <a href="#" class="ml-2 text-indigo-500 hover:text-indigo-700 flex items-center">
+                            Learn more <i class="fas fa-arrow-right ml-1 text-xs transition-transform group-hover:translate-x-1"></i>
+                        </a>
+                    </div>
+                    
+                    <h1 class="max-w-2xl text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl animate__animated animate__fadeIn">
+                        <span class="gradient-text">Data-driven</span> decisions made simple
+                    </h1>
+                    <p class="mt-6 text-lg leading-8 text-gray-600 animate__animated animate__fadeIn animate__delay-1s">
+                        Unlock powerful insights with our intuitive analytics platform. Transform raw data into actionable intelligence that drives your business forward.
+                    </p>
+                    
+                    <div class="mt-10 flex items-center gap-x-6 animate__animated animate__fadeInUp animate__delay-1s">
+                        <a href="{% url 'user_login' %}" class="group relative flex items-center rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-3.5 text-sm font-semibold text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                            <i class="fas fa-user mr-2 group-hover:scale-110 transition-transform"></i>
+                            User Login
+                            <span class="absolute inset-0 rounded-lg bg-gradient-to-r from-indigo-700 to-purple-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></span>
+                        </a>
+                        
+                        <a href="{% url 'organization_login' %}" class="group relative flex items-center rounded-lg bg-white px-6 py-3.5 text-sm font-semibold text-indigo-600 shadow-lg hover:shadow-xl ring-1 ring-indigo-200 transition-all duration-300 transform hover:-translate-y-1">
+                            <i class="fas fa-building mr-2 text-indigo-500 group-hover:scale-110 transition-transform"></i>
+                            Organization Login
+                            <i class="fas fa-arrow-right ml-2 text-indigo-400 group-hover:text-indigo-600 group-hover:translate-x-1 transition-all"></i>
+                        </a>
+                    </div>
+                    
+                    <!-- Trust indicators -->
+                    <div class="mt-10 flex items-center gap-x-8 animate__animated animate__fadeIn animate__delay-2s">
+                        <div class="text-sm text-gray-500">Trusted by leading companies:</div>
+                        <div class="flex space-x-6">
+                            <div class="h-8 flex items-center justify-center opacity-70 hover:opacity-100 transition-opacity">
+                                <i class="fab fa-apple text-2xl text-gray-700"></i>
+                            </div>
+                            <div class="h-8 flex items-center justify-center opacity-70 hover:opacity-100 transition-opacity">
+                                <i class="fab fa-google text-2xl text-gray-700"></i>
+                            </div>
+                            <div class="h-8 flex items-center justify-center opacity-70 hover:opacity-100 transition-opacity">
+                                <i class="fab fa-microsoft text-2xl text-gray-700"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Hero Image -->
+                <div class="mt-16 sm:mt-24 lg:mt-0 lg:flex-shrink-0 lg:flex-grow animate__animated animate__fadeInRight">
+                    <div class="glass-card rounded-2xl p-2 shadow-2xl hover-scale">
+                        <img src="https://illustrations.popsy.co/amber/digital-nomad.svg" alt="Analytics dashboard" class="w-full h-auto rounded-xl">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="py-16 sm:py-24">
+        <div class="mx-auto max-w-7xl px-6 lg:px-8">
+            <div class="mx-auto max-w-2xl lg:text-center">
+                <h2 class="text-base font-semibold leading-7 text-indigo-600">Everything you need</h2>
+                <p class="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+                    Powerful analytics for modern businesses
+                </p>
+                <p class="mt-6 text-lg leading-8 text-gray-600">
+                    Our platform provides comprehensive tools to analyze, visualize, and act on your data with unprecedented clarity.
+                </p>
+            </div>
+            
+            <div class="mt-16">
+                <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                    <!-- Feature 1 -->
+                    <div class="glass-card rounded-2xl p-6 hover-scale transition-all duration-300 group">
+                        <div class="w-12 h-12 rounded-lg bg-indigo-100 flex items-center justify-center mb-4 group-hover:bg-indigo-600 transition-colors">
+                            <i class="fas fa-chart-pie text-indigo-600 text-xl group-hover:text-white"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">Advanced Visualization</h3>
+                        <p class="text-gray-600">Create stunning, interactive dashboards that bring your data to life with our powerful visualization tools.</p>
+                    </div>
+                    
+                    <!-- Feature 2 -->
+                    <div class="glass-card rounded-2xl p-6 hover-scale transition-all duration-300 group">
+                        <div class="w-12 h-12 rounded-lg bg-indigo-100 flex items-center justify-center mb-4 group-hover:bg-indigo-600 transition-colors">
+                            <i class="fas fa-bolt text-indigo-600 text-xl group-hover:text-white"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">Real-time Analytics</h3>
+                        <p class="text-gray-600">Monitor your business metrics in real-time with sub-second latency and instant updates.</p>
+                    </div>
+                    
+                    <!-- Feature 3 -->
+                    <div class="glass-card rounded-2xl p-6 hover-scale transition-all duration-300 group">
+                        <div class="w-12 h-12 rounded-lg bg-indigo-100 flex items-center justify-center mb-4 group-hover:bg-indigo-600 transition-colors">
+                            <i class="fas fa-robot text-indigo-600 text-xl group-hover:text-white"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">AI-Powered Insights</h3>
+                        <p class="text-gray-600">Our machine learning algorithms surface hidden patterns and opportunities in your data.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="relative py-16 sm:py-24 bg-white/50 backdrop-blur-sm">
+        <div class="mx-auto max-w-7xl px-6 lg:px-8">
+            <div class="grid grid-cols-1 gap-y-16 gap-x-8 sm:grid-cols-2 lg:grid-cols-4">
+                <!-- Stat 1 -->
+                <div class="text-center">
+                    <div class="text-4xl font-bold text-indigo-600 mb-2">
+                        <span class="counter" data-target="99.9">0</span>%
+                    </div>
+                    <div class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Uptime</div>
+                </div>
+                
+                <!-- Stat 2 -->
+                <div class="text-center">
+                    <div class="text-4xl font-bold text-indigo-600 mb-2">
+                        <span class="counter" data-target="500">0</span>+
+                    </div>
+                    <div class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Happy Clients</div>
+                </div>
+                
+                <!-- Stat 3 -->
+                <div class="text-center">
+                    <div class="text-4xl font-bold text-indigo-600 mb-2">
+                        <span class="counter" data-target="24">0</span>/7
+                    </div>
+                    <div class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Support</div>
+                </div>
+                
+                <!-- Stat 4 -->
+                <div class="text-center">
+                    <div class="text-4xl font-bold text-indigo-600 mb-2">
+                        <span class="counter" data-target="100">0</span>+
+                    </div>
+                    <div class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Integrations</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA Section -->
+    <div class="relative isolate overflow-hidden py-16 sm:py-24 bg-gradient-to-br from-indigo-50 to-purple-50">
+        <div class="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-indigo-100/50 to-purple-100/50"></div>
+        
+        <div class="mx-auto max-w-7xl px-6 lg:px-8">
+            <div class="mx-auto max-w-2xl lg:mx-0 lg:max-w-none">
+                <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+                    Ready to transform your data strategy?
+                </h2>
+                <p class="mt-6 text-lg leading-8 text-gray-600">
+                    Join thousands of businesses that trust our platform for their critical analytics needs.
+                </p>
+                
+                <div class="mt-10 flex items-center gap-x-6">
+                    <a href="{% url 'user_login' %}" class="group relative flex items-center rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-3.5 text-sm font-semibold text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                        <i class="fas fa-user mr-2 group-hover:scale-110 transition-transform"></i>
+                        User Login
+                        <span class="absolute inset-0 rounded-lg bg-gradient-to-r from-indigo-700 to-purple-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></span>
+                    </a>
+                    
+                    <a href="{% url 'organization_login' %}" class="group relative flex items-center rounded-lg bg-white px-6 py-3.5 text-sm font-semibold text-indigo-600 shadow-lg hover:shadow-xl ring-1 ring-indigo-200 transition-all duration-300 transform hover:-translate-y-1">
+                        <i class="fas fa-building mr-2 text-indigo-500 group-hover:scale-110 transition-transform"></i>
+                        Organization Login
+                        <i class="fas fa-arrow-right ml-2 text-indigo-400 group-hover:text-indigo-600 group-hover:translate-x-1 transition-all"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white/50 backdrop-blur-sm border-t border-gray-200">
+        <div class="mx-auto max-w-7xl px-6 py-12 lg:px-8">
+            <div class="grid grid-cols-2 gap-8 md:grid-cols-4 lg:grid-cols-5">
+                <div class="col-span-2">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center shadow-md">
+                            <i class="fas fa-chart-line text-white text-sm"></i>
+                        </div>
+                        <span class="text-xl font-bold text-indigo-800">AnalyticsPro</span>
+                    </div>
+                    <p class="mt-4 text-sm leading-6 text-gray-600">
+                        The most powerful analytics platform for data-driven businesses.
+                    </p>
+                    <div class="mt-6 flex space-x-6">
+                        <a href="#" class="text-gray-500 hover:text-indigo-600 transition-colors">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-gray-500 hover:text-indigo-600 transition-colors">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        <a href="#" class="text-gray-500 hover:text-indigo-600 transition-colors">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                        <a href="#" class="text-gray-500 hover:text-indigo-600 transition-colors">
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-sm font-semibold leading-6 text-gray-900">Product</h3>
+                    <ul class="mt-6 space-y-4">
+                        <li><a href="#" class="text-sm leading-6 text-gray-600 hover:text-indigo-600 transition-colors">Features</a></li>
+                        <li><a href="#" class="text-sm leading-6 text-gray-600 hover:text-indigo-600 transition-colors">Solutions</a></li>
+                        <li><a href="#" class="text-sm leading-6 text-gray-600 hover:text-indigo-600 transition-colors">Pricing</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-sm font-semibold leading-6 text-gray-900">Company</h3>
+                    <ul class="mt-6 space-y-4">
+                        <li><a href="#" class="text-sm leading-6 text-gray-600 hover:text-indigo-600 transition-colors">About</a></li>
+                        <li><a href="#" class="text-sm leading-6 text-gray-600 hover:text-indigo-600 transition-colors">Careers</a></li>
+                        <li><a href="#" class="text-sm leading-6 text-gray-600 hover:text-indigo-600 transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-sm font-semibold leading-6 text-gray-900">Resources</h3>
+                    <ul class="mt-6 space-y-4">
+                        <li><a href="#" class="text-sm leading-6 text-gray-600 hover:text-indigo-600 transition-colors">Blog</a></li>
+                        <li><a href="#" class="text-sm leading-6 text-gray-600 hover:text-indigo-600 transition-colors">Help Center</a></li>
+                        <li><a href="#" class="text-sm leading-6 text-gray-600 hover:text-indigo-600 transition-colors">API Docs</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="mt-16 border-t border-gray-200 pt-8 flex flex-col md:flex-row justify-between">
+                <p class="text-xs leading-5 text-gray-500">
+                    &copy; 2023 AnalyticsPro. All rights reserved.
+                </p>
+                <div class="mt-4 md:mt-0 flex space-x-6">
+                    <a href="#" class="text-xs leading-5 text-gray-500 hover:text-indigo-600 transition-colors">Privacy</a>
+                    <a href="#" class="text-xs leading-5 text-gray-500 hover:text-indigo-600 transition-colors">Terms</a>
+                    <a href="#" class="text-xs leading-5 text-gray-500 hover:text-indigo-600 transition-colors">Cookies</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Create floating particles
+        function createParticles() {
+            const container = document.getElementById('particles-container');
+            const particleCount = 20;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Random properties
+                const size = Math.random() * 8 + 4;
+                const posX = Math.random() * 100;
+                const duration = Math.random() * 20 + 10;
+                const delay = Math.random() * 10;
+                
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${posX}%`;
+                particle.style.bottom = `-${size}px`;
+                particle.style.animationDuration = `${duration}s`;
+                particle.style.animationDelay = `${delay}s`;
+                
+                container.appendChild(particle);
+            }
+        }
+        
+        // Counter animation
+        function animateCounters() {
+            const counters = document.querySelectorAll('.counter');
+            const speed = 200;
+            
+            counters.forEach(counter => {
+                const updateCount = () => {
+                    const target = +counter.getAttribute('data-target');
+                    const count = +counter.innerText;
+                    const increment = target / speed;
+                    
+                    if(count < target) {
+                        counter.innerText = target % 1 === 0 ? Math.ceil(count + increment) : (count + increment).toFixed(1);
+                        setTimeout(updateCount, 1);
+                    } else {
+                        counter.innerText = target;
+                    }
+                };
+                
+                updateCount();
+            });
+        }
+        
+        // Initialize animations when page loads
+        window.addEventListener('load', () => {
+            createParticles();
+            animateCounters();
+        });
+    </script>
+</body>
+</html>

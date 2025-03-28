@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Job Postings</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #007bff;
+            text-align: center;
+            margin: 20px 0;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            background: #fafafa;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            transition: box-shadow 0.3s ease-in-out;
+        }
+        li:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Job Postings</h2>
+
+
+        <ul>
+            {% for job in job_postings %}
+                <li>
+                    <a href="{% url 'job_posting_detail' org_id=organization.id pk=job.id %}">{{ job.title }}</a>
+                    <br>
+                    <small>Location: {{ job.location }}</small>
+                    <br>
+                    <small>Posted on: {{ job.posted_on }}</small>
+                    <br>
+                    <small> <a href="{% url 'job_posting_update' org_id=organization.id pk=job.pk %}">Update</a> </small>
+                    <small> <a href="{% url 'job_posting_delete' org_id=organization.id pk=job.pk %}">Delete</a> </small>
+                </li>
+            {% endfor %}
+        </ul>
+        {% if not job_postings %}
+            <p>No job postings available.</p>
+        {% endif %}
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>View Organization Profile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .btn {
+            margin: 20px;
+        }
+        .btn a {
+            text-decoration: none;
+        }
+        .btn button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .btn button:hover {
+            background-color: #0056b3;
+        }
+        h2 {
+            text-align: center;
+            color: #007bff;
+            margin-top: 20px;
+        }
+        .profile-container {
+            width: 50%;
+            margin: 0 auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .profile-item {
+            margin: 10px 0;
+        }
+        .profile-item img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+        .profile-links a {
+            color: #007bff;
+            text-decoration: none;
+            margin-right: 10px;
+        }
+        .profile-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="btn">
+        <a href="{% url 'organization_dashboard' %}"><button>Back</button></a>
+    </div>
+    <h2>Organization Profile</h2>
+    <div class="profile-container">
+        <div class="profile-item">
+            <p><strong>Profile Image:</strong></p>
+            {% if organization.profile_image %}
+                <img src="{{ organization.profile_image.url }}" alt="Profile Image">
+            {% else %}
+                <p>No profile image available.</p>
+            {% endif %}
+        </div>
+        <div class="profile-item">
+            <p><strong>Banner Image:</strong></p>
+            {% if organization.banner_image %}
+                <img src="{{ organization.banner_image.url }}" alt="Banner Image">
+            {% else %}
+                <p>No banner image available.</p>
+            {% endif %}
+        </div>
+        <div class="profile-item">
+            <p><strong>Name:</strong> {{ organization.name }}</p>
+        </div>
+        <div class="profile-item">
+            <p><strong>Description:</strong> {{ organization.description }}</p>
+        </div>
+        <div class="profile-item">
+            <p><strong>Website:</strong> <a href="{{ organization.website }}">{{ organization.website }}</a></p>
+        </div>
+        <div class="profile-item">
+            <p><strong>Registration Number:</strong> {{ organization.registration_number }}</p>
+        </div>
+        <div class="profile-links">
+            <a href="{% url 'organization_profile_image_update' %}">Edit Profile Image</a>
+            <a href="{% url 'organization_banner_image_update' %}">Edit Banner Image</a>
+            <a href="{% url 'organization_details_update' %}">Edit Organization Details</a>
+        </div>
+    </div>
+</body>
+</html>

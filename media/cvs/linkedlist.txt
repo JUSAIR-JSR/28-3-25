@@ -1,0 +1,108 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int data;
+    struct Node* next;
+};
+struct Node* head; //.............important............
+
+
+//Normal linked list
+void Insert(int value) {
+    struct Node* temp = (struct Node*)malloc(sizeof(struct Node));
+    temp->data = value;
+    temp->next = head;
+    head = temp;
+}
+
+//specified linkedlist
+void InsertSpecified(int value,int pos) {
+    struct Node* temp1 = (struct Node*)malloc(sizeof(struct Node));
+    temp1->data = value;
+    temp1->next = NULL;
+
+    struct Node* temp = head;
+    struct Node* prev = NULL;
+    
+    for (int i = 1; i < pos; i++)
+    {
+        prev = temp;
+        temp = temp->next;
+    }
+    prev->next=temp1;
+    temp1->next=temp;
+}
+
+//end linked list
+void InsertEnd(int value){
+     struct Node* temp1 = (struct Node*)malloc(sizeof(struct Node));
+    temp1->data = value;
+    temp1->next = NULL;
+
+    struct Node* temp = head;
+    while (temp->next!=NULL)
+    {
+        temp = temp->next;
+    }
+    temp->next=temp1;   
+}
+//Delete the linkedlist...ith..begin,end,specified ...ellam oraal cheyyum{Anniyan}
+void Delete(int value){
+    struct Node* temp = head;
+    struct Node* prev = NULL;
+    
+    while (temp != NULL && temp->data != value) {
+        prev = temp;
+        temp = temp->next;
+    }
+    prev->next = temp->next;
+    free(temp); 
+}
+
+//Display linkedlist
+void Display(){
+    struct Node* temp = head;
+    printf("Display the values: ");
+    while (temp != NULL) {
+        printf("%d\t", temp->data);
+        temp = temp->next;
+    }
+    printf("\n");
+}
+
+
+int main(){
+    head = NULL;  //.............important............
+    printf("How many numbers: ");
+    int size, value,pos;
+    scanf("%d", &size);
+    for (int i = 0; i < size; i++) {
+        printf("Enter the number: ");
+        scanf("%d", &value);
+        Insert(value); 
+        Display();
+    }
+
+    //insert at specified
+    printf("enter position you want to insert:\n");
+    scanf("%d",&pos);
+    printf("enter the specied value:\n");
+    scanf("%d",&value);
+    InsertSpecified(value,pos);
+    Display();
+
+//insert at end
+    printf("enter the end value:\n");
+    scanf("%d",&value);
+    InsertEnd(value);
+    Display();
+
+//Delete the node
+    printf("Enter the value to delete: ");
+    scanf("%d", &value);
+    Delete(value);
+    Display();
+
+    return 0;
+}
