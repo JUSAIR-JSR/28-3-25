@@ -15,10 +15,9 @@ class ReviewQuestion(models.Model):
 class InterviewReview(models.Model):
     interview = models.ForeignKey(Interview, on_delete=models.CASCADE, related_name='reviews')
     question = models.ForeignKey(ReviewQuestion, on_delete=models.CASCADE)
-    rating = models.IntegerField(blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)  # Add this field
+    rating = models.IntegerField(blank=True, null=True, choices=[(i, f"{i}/10") for i in range(11)])  # Rating between 0 and 10
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Review for {self.interview}"
-
+        return f"Review for {self.interview} - {self.rating}/10"
 

@@ -191,13 +191,20 @@ def job_application_create(request, org_id, pk):
 def job_application_success(request):
     return render(request, 'jobs/job_application_success.html')
 
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from interviews.models import Interview
+from interviews.forms import InterviewForm
+from jobs.models import JobPosting, JobApplication
+from organizations.models import Organization
+
 @login_required
 def job_posting_detail(request, org_id, pk):
     organization = get_object_or_404(Organization, id=org_id)
     job_posting = get_object_or_404(JobPosting, pk=pk, organization=organization)
     applications = JobApplication.objects.filter(job=job_posting)
-    
-    # Check if user has permission to manage applications
+
+    # Check if user has permission to manage applications and interviews
     can_manage = False
     if request.user == organization.user:
         can_manage = True
@@ -211,37 +218,50 @@ def job_posting_detail(request, org_id, pk):
         if hr_role:
             can_manage = True
 
+    form = None  # Initialize the form outside the if conditions to ensure it always exists
+
     if can_manage:
         if request.method == 'POST':
-            form = JobApplicationStatusForm(request.POST)
-            if form.is_valid():
-                application = get_object_or_404(JobApplication, pk=request.POST.get('application_id'))
-                application.status = form.cleaned_data['status']
+            # Handle status update
+            if 'update_status' in request.POST:
+                application = get_object_or_404(JobApplication, id=request.POST['application_id'])
+                application.status = request.POST.get('status')
                 application.save()
-
-                Notification.objects.create(
-                    user=application.applicant,
-                    message=f"Your application status for {application.job.title} has been updated to {application.status}."
-                )
-
                 return redirect('job_posting_detail', org_id=org_id, pk=pk)
+
+            # Handle creating or updating an interview
+            if 'create_interview' in request.POST:
+                job_application = get_object_or_404(JobApplication, id=request.POST.get('application_id'))
+                form = InterviewForm(request.POST)
+                if form.is_valid():
+                    interview = form.save(commit=False)
+                    interview.job_application = job_application
+                    interview.save()  # Save the interview
+
+                    # Add a success message (optional)
+                    return redirect('job_posting_detail', org_id=org_id, pk=pk)
+
+            # Handle interview update or deletion
+            if 'update_interview' in request.POST:
+                interview = get_object_or_404(Interview, id=request.POST['interview_id'])
+                return redirect('update_interview', interview_id=interview.id)
+            elif 'delete_interview' in request.POST:
+                interview = get_object_or_404(Interview, id=request.POST['interview_id'])
+                interview.delete()
+                return redirect('job_posting_detail', org_id=org_id, pk=pk)
+
         else:
-            form = JobApplicationStatusForm()
-        
-        return render(request, 'jobs/job_posting_detail.html', {
-            'job_posting': job_posting,
-            'applications': applications,
-            'form': form,
-            'organization': organization,
-            'can_manage': can_manage
-        })
-    
+            form = InterviewForm()  # If GET request, initialize form here
+
     return render(request, 'jobs/job_posting_detail.html', {
         'job_posting': job_posting,
         'applications': applications,
         'organization': organization,
-        'can_manage': can_manage
+        'can_manage': can_manage,
+        'form': form if can_manage else None
     })
+
+
 
 
 from django.shortcuts import render, get_object_or_404, redirect
@@ -300,4 +320,65 @@ def job_posting_org_view(request, org_id=None):
         'current_org': current_org,
         'hr_roles': hr_organizations,  # Changed from hr_organizations to hr_roles
         'is_owner': is_owner
+    })
+
+
+
+
+from django.shortcuts import render, get_object_or_404
+from .models import JobApplication
+
+def job_application_detail(request, pk):
+    job_application = get_object_or_404(JobApplication, pk=pk)
+    return render(request, 'jobs/job_application_detail.html', {'job_application': job_application})
+
+
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from interviews.models import Interview
+from interviews.forms import InterviewForm
+from jobs.models import JobPosting, JobApplication
+from organizations.models import Organization
+
+@login_required
+def manage_interview(request, org_id, job_id, application_id, interview_id=None):
+    organization = get_object_or_404(Organization, id=org_id)
+    job_posting = get_object_or_404(JobPosting, id=job_id, organization=organization)
+    job_application = get_object_or_404(JobApplication, id=application_id, job=job_posting)
+
+    # Check if user has permission to manage interviews
+    can_manage = False
+    if request.user == organization.user:
+        can_manage = True
+    else:
+        hr_role = OrganizationHR.objects.filter(
+            user=request.user,
+            organization=organization,
+            is_active=True,
+            can_manage_applications=True
+        ).first()
+        if hr_role:
+            can_manage = True
+
+    if not can_manage:
+        return redirect('job_posting_detail', org_id=org_id, pk=job_id)
+
+    if interview_id:  # Update an existing interview
+        interview = get_object_or_404(Interview, id=interview_id)
+        form = InterviewForm(request.POST or None, instance=interview)
+    else:  # Create a new interview
+        form = InterviewForm(request.POST or None)
+
+    if request.method == 'POST' and form.is_valid():
+        interview = form.save(commit=False)
+        interview.job_application = job_application
+        interview.save()
+        return redirect('job_posting_detail', org_id=org_id, pk=job_id)
+
+    return render(request, 'jobs/manage_interview.html', {
+        'job_posting': job_posting,
+        'job_application': job_application,
+        'form': form,
+        'interview': interview if interview_id else None
     })

@@ -13,15 +13,49 @@
     {% if job_posting.job_post_image %}
         <p><img width="150" height="150" src="{{ job_posting.job_post_image.url }}" alt="{{ job_posting.title }}"></p>
     {% endif %}
+    
     <h3>Applicants</h3>
     <ul>
         {% for application in applications %}
             <li>
                 <a href="{% url 'user_profile' application.applicant.username %}">{{ application.applicant.username }}</a>
                 - {{ application.status }}
+                {% if can_manage %}
+                    <!-- Status Update Form -->
+                    <form method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="application_id" value="{{ application.id }}">
+                        <select name="status">
+                            <option value="pending" {% if application.status == "pending" %}selected{% endif %}>Pending</option>
+                            <option value="accepted" {% if application.status == "accepted" %}selected{% endif %}>Accepted</option>
+                            <option value="rejected" {% if application.status == "rejected" %}selected{% endif %}>Rejected</option>
+                            <option value="interview_scheduled" {% if application.status == "interview_scheduled" %}selected{% endif %}>Interview Scheduled</option>
+                            <option value="offer_made" {% if application.status == "offer_made" %}selected{% endif %}>Offer Made</option>
+                        </select>
+                        <button type="submit" name="update_status" value="true">Update Status</button>
+                    </form>
+                {% endif %}
+               
+                {% if not application.interviews.exists %}
+                <a href="{% url 'create_interview' org_id=organization.id job_id=job_posting.id application_id=application.id %}">Create Interview</a>
+            {% else %}
+                {% for interview in application.interviews.all %}
+                    <p>Interview Date: {{ interview.scheduled_time }}</p>
+                    <p>Interview Link: <a href="{{ interview.interview_link }}">{{ interview.interview_link }}</a></p>
+                    <a href="{% url 'update_interview' org_id=organization.id job_id=job_posting.id application_id=application.id interview_id=interview.id %}">Update Interview</a>
+                    <form method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="interview_id" value="{{ interview.id }}">
+                        <button type="submit" name="delete_interview" value="true">Delete Interview</button>
+                    </form>
+                {% endfor %}
+            {% endif %}
+
             </li>
         {% endfor %}
     </ul>
     <a href="{% url 'job_posting_list' org_id=organization.id %}">Back to Job Postings</a>
+
+ 
 </body>
 </html>

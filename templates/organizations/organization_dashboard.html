@@ -241,12 +241,6 @@
             </div>
             {% endif %}
 
-            {% if request.user.hr_roles.exists %}  <!-- Using your related_name -->
-            <div class="py-4 px-2">
-                <a href="{% url 'hr_dashboard' %}" class="shadow-lg shadow-black rounded-md bg-green-500 text-white px-2 py-2">HR Dashboard</a>
-            </div>
-            {% endif %}
-
             <!-------------------------------------------------------------------------------------->
             <!-------------------------------------------------------------------------------------->
             <!-------------------------------------------------------------------------------------->

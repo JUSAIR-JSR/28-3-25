@@ -1,0 +1,10 @@
+<h2>Job Application Detail</h2>
+
+<div class="application-details">
+    <p><strong>Job:</strong> {{ job_application.job.title }}</p>
+    <p><strong>Applicant:</strong> {{ job_application.user.username }}</p>
+    <p><strong>Status:</strong> {{ job_application.status }}</p>
+    <p><strong>Application Date:</strong> {{ job_application.created_at }}</p>
+
+    <!-- Add other details about the job application as needed -->
+</div>

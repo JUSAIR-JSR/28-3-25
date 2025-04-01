@@ -183,70 +183,7 @@ def manage_hr_staff(request, hr_id=None):
 
 
 
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from jobs.models import JobApplication  # Correct import statement
-from jobs.forms import JobApplicationStatusForm  # Correct import statement
-from notifications.models import Notification
 
-@login_required
-def manage_job_applications(request, org_id=None):
-    # Get the organization - either from URL or user's default
-    if org_id:
-        organization = get_object_or_404(Organization, id=org_id)
-        # Verify HR has permissions for this org
-        hr_role = OrganizationHR.objects.filter(
-            user=request.user,
-            organization=organization,
-            is_active=True,
-            can_manage_applications=True
-        ).first()
-        if not hr_role and request.user != organization.user:
-            return redirect('index_dashboard')
-    else:
-        try:
-            # Organization owner access
-            organization = request.user.organization
-        except Organization.DoesNotExist:
-            # HR staff access - get first organization they have permissions for
-            hr_role = OrganizationHR.objects.filter(
-                user=request.user,
-                is_active=True,
-                can_manage_applications=True
-            ).first()
-            if not hr_role:
-                return redirect('index_dashboard')
-            organization = hr_role.organization
-
-    # Get applications for this organization
-    job_applications = JobApplication.objects.filter(
-        job__organization=organization
-    ).select_related('job', 'applicant')
-
-    if request.method == 'POST':
-        form = JobApplicationStatusForm(request.POST)
-        if form.is_valid():
-            application = get_object_or_404(JobApplication, 
-                pk=request.POST.get('application_id'),
-                job__organization=organization
-            )
-            application.status = form.cleaned_data['status']
-            application.save()
-
-            Notification.objects.create(
-                user=application.applicant,
-                message=f"Your application status for {application.job.title} has been updated to {application.status}."
-            )
-            return redirect('manage_job_applications', org_id=organization.id)
-    else:
-        form = JobApplicationStatusForm()
-
-    return render(request, 'organizations/manage_job_applications.html', {
-        'organization': organization,
-        'job_applications': job_applications,
-        'form': form,
-        'is_owner': request.user == organization.user
-    })
 
 
 def organization_login(request):
@@ -316,76 +253,77 @@ def user_search(request):
     results = [{'id': user.id, 'text': user.username} for user in users]
     return JsonResponse({'results': results})
 
-from django.db.models import Count
+
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from jobs.models import JobApplication  # Correct import statement
+from jobs.forms import JobApplicationStatusForm  # Correct import statement
+from notifications.models import Notification
+from organizations.models import Organization, OrganizationHR  # Import Organization and HR model
+
 @login_required
-def hr_dashboard(request, org_id=None):
-    """
-    HR-specific dashboard that:
-    - Shows only organizations the HR has access to
-    - Strictly isolates data per organization
-    - Provides organization switching
-    """
-    # Get all active HR roles for this user
-    hr_roles = OrganizationHR.objects.filter(
-        user=request.user,
-        is_active=True
-    ).select_related('organization')
-    
-    # If no HR roles, redirect (shouldn't normally happen as decorator should prevent)
-    if not hr_roles.exists():
-        return redirect('index_dashboard')
+def manage_job_applications(request, org_id=None):
+    # Get the organization - either from URL or user's default
+    if org_id:
+        organization = get_object_or_404(Organization, id=org_id)
+        # Verify HR has permissions for this org
+        hr_role = OrganizationHR.objects.filter(
+            user=request.user,
+            organization=organization,
+            is_active=True,
+            can_manage_applications=True
+        ).first()
+        if not hr_role and request.user != organization.user:
+            return redirect('index_dashboard')
+    else:
+        try:
+            # Organization owner access
+            organization = request.user.organization
+        except Organization.DoesNotExist:
+            # HR staff access - get first organization they have permissions for
+            hr_role = OrganizationHR.objects.filter(
+                user=request.user,
+                is_active=True,
+                can_manage_applications=True
+            ).first()
+            if not hr_role:
+                return redirect('index_dashboard')
+            organization = hr_role.organization
 
-    # If no org_id specified, redirect to first organization
-    if not org_id:
-        return redirect('hr_dashboard', org_id=hr_roles.first().organization.id)
+    # Get applications for this organization
+    job_applications = JobApplication.objects.filter(
+        job__organization=organization
+    ).select_related('job', 'applicant')
 
-    # Get current organization and verify access
-    current_org = get_object_or_404(Organization, id=org_id)
-    current_hr_role = hr_roles.filter(organization=current_org).first()
-    
-    # If no access to requested org, redirect to first available
-    if not current_hr_role:
-        return redirect('hr_dashboard', org_id=hr_roles.first().organization.id)
+    if request.method == 'POST':
+        form = JobApplicationStatusForm(request.POST)
+        if form.is_valid():
+            application = get_object_or_404(JobApplication, 
+                pk=request.POST.get('application_id'),
+                job__organization=organization
+            )
+            
+            # Ensure that only the job's HR or the organization owner can update the status
+            if application.job.user == request.user or hr_role:
+                application.status = form.cleaned_data['status']
+                application.save()
 
-    # Get organization-specific data with strict filtering
-    job_postings = JobPosting.objects.filter(
-        organization=current_org
-    ).order_by('-posted_on')
-    
-    applications = JobApplication.objects.none()
-    if current_hr_role.can_manage_applications:
-        applications = JobApplication.objects.filter(
-            job__organization=current_org
-        ).select_related('job', 'applicant')
-    
-    interviews = Interview.objects.none()
-    if current_hr_role.can_schedule_interviews:
-        interviews = Interview.objects.filter(
-            job_application__job__organization=current_org
-        ).select_related('job_application')
+                # Create a notification for the applicant about the status update
+                Notification.objects.create(
+                    user=application.applicant,
+                    message=f"Your application status for {application.job.title} has been updated to {application.status}."
+                )
+                return redirect('manage_job_applications', org_id=organization.id)
+            else:
+                # If the user is not authorized to update this application, redirect them
+                return redirect('index_dashboard')
+    else:
+        form = JobApplicationStatusForm()
 
-    context = {
-        # Organization info
-        'current_org': current_org,
-        'hr_organizations': [hr.organization for hr in hr_roles],
-        
-        # HR role and permissions
-        'hr_role': current_hr_role,
-        'can_post_jobs': current_hr_role.can_post_jobs,
-        'can_manage_applications': current_hr_role.can_manage_applications,
-        'can_schedule_interviews': current_hr_role.can_schedule_interviews,
-        
-        # Organization data
-        'job_postings': job_postings,
-        'applications': applications,
-        'interviews': interviews,
-        
-        # UI helpers
-        'is_hr': True,
-        'is_owner': False,  # HR dashboard is never for owners
-    }
-    
-    return render(request, 'organizations/hr_dashboard.html', context)
-
-
-
+    return render(request, 'organizations/manage_job_applications.html', {
+        'organization': organization,
+        'job_applications': job_applications,
+        'form': form,
+        'is_owner': request.user == organization.user
+    })

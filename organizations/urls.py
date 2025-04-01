@@ -23,7 +23,5 @@ urlpatterns = [
     path('<int:org_id>/applications/', views.manage_job_applications, name='manage_job_applications'),
 
         path('api/users/search/', views.user_search, name='user_search'),
-    path('hr-dashboard/', views.hr_dashboard, name='hr_dashboard'),
-    path('hr-dashboard/<int:org_id>/', views.hr_dashboard, name='hr_dashboard'),
 
 ]

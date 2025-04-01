@@ -87,12 +87,14 @@
                     Job: {{ application.job.title }} <br>
                     Applicant: <a href="{% url 'user_profile' application.applicant.username %}">{{ application.applicant.username }}</a> <br>
                     Status: {{ application.status }}
-                    <form method="post" action="{% url 'manage_job_applications' %}">
-                        {% csrf_token %}
-                        <input type="hidden" name="application_id" value="{{ application.id }}">
-                        {{ form.status }}
-                        <button type="submit">Update Status</button>
-                    </form>
+                    {% if is_owner or request.user == application.job.user %}
+                        <form method="post" action="{% url 'manage_job_applications' org_id=organization.id %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="application_id" value="{{ application.id }}">
+                            {{ form.status }}
+                            <button type="submit">Update Status</button>
+                        </form>
+                    {% endif %}
                 </li>
             {% endfor %}
         </ul>

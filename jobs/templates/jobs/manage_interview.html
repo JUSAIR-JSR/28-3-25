@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% if interview %}Update{% else %}Create{% endif %} Interview</title>
+</head>
+<body>
+    <h2>{% if interview %}Update{% else %}Create{% endif %} Interview</h2>
+    
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">{% if interview %}Update{% else %}Create{% endif %} Interview</button>
+    </form>
+
+</body>
+</html>

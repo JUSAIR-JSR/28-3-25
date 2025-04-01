@@ -1,15 +1,28 @@
-{% for job in job_postings %}
-    <div class="job-post">
-        <h3>{{ job.title }}</h3>
-        <p>Posted by: 
-            {% if job.posted_by == current_org.user %}
-                Organization Owner
-            {% else %}
-                {{ job.posted_by.get_full_name }} (HR)
-            {% endif %}
-        </p>
-        <p>{{ job.description }}</p>
-    </div>
-{% empty %}
-    <p>No job postings found.</p>
-{% endfor %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Job Postings</title>
+</head>
+<body>
+    <h2>Job Postings for {{ current_org.name }}</h2>
+
+    {% if is_owner %}
+        <h3>All Job Postings:</h3>
+    {% else %}
+        <h3>My Job Postings:</h3>
+    {% endif %}
+
+    <ul>
+        {% for job in job_postings %}
+            <li>
+                <a href="{% url 'job_posting_detail' org_id=current_org.id pk=job.id %}">{{ job.title }}</a>
+                - Posted by: {{ job.posted_by.username }}
+            </li>
+        {% endfor %}
+    </ul>
+
+
+
+    <a href="{% url 'index_dashboard' %}">Back to Dashboard</a>
+</body>
+</html>
