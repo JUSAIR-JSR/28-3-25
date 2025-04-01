@@ -38,23 +38,23 @@ def delete_interview(request, interview_id):
         return redirect('interview_list')
     return render(request, 'interviews/delete_interview.html', {'interview': interview})
 
-@login_required
-def interview_list(request):
-    if request.user.is_staff:
-        organization = request.user.organization
-        interviews = Interview.objects.filter(job_application__job__organization=organization)
-    else:
-        interviews = Interview.objects.filter(job_application__applicant=request.user)
-    
-    interviews_with_reviews = []
-    for interview in interviews:
-        interview_with_reviews = {
-            'interview': interview,
-            'reviews': InterviewReview.objects.filter(interview=interview)
-        }
-        interviews_with_reviews.append(interview_with_reviews)
-    
-    return render(request, 'interviews/interview_list.html', {'interviews_with_reviews': interviews_with_reviews})
+from django.shortcuts import render, get_object_or_404
+from interviews.models import Interview
+from jobs.models import JobPosting
+from organizations.models import Organization
+
+def interview_list(request, org_id):
+    organization = get_object_or_404(Organization, id=org_id)  # Get organization
+    job_posts = JobPosting.objects.filter(organization=organization)  # Get job posts of this organization
+    interviews = Interview.objects.filter(job_application__job__in=job_posts)  # Filter interviews via job application
+
+    context = {
+        'organization': organization,
+        'interviews': interviews,
+    }
+    return render(request, 'interviews/interview_list.html', context)
+
+
 
 
 

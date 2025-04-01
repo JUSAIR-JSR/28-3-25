@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Interview List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #007bff;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            background: #fff;
+            margin: 10px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 15px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        .btn-delete {
+            background: #d9534f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Interviews for {{ organization.name }}</h2>
+
+        {% if interviews %}
+            <ul>
+                {% for interview in interviews %}
+                    <li>
+                        <strong>Job:</strong> {{ interview.job_application.job.title }} <br>
+                        <strong>Applicant:</strong> {{ interview.job_application.applicant.username }} <br>
+                        <strong>Scheduled Time:</strong> {{ interview.scheduled_time }} <br>
+                        <strong>Interview Link:</strong> <a href="{{ interview.interview_link }}" target="_blank">Join</a> <br>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No interviews scheduled yet.</p>
+        {% endif %}
+    </div>
+</body>
+</html>

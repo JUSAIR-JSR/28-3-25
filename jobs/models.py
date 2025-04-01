@@ -10,7 +10,6 @@ class Skill(models.Model):
 
 from django.db import models
 from organizations.models import Organization
-from users.models import Skill  # Import Skill model from users app
 
 class JobPosting(models.Model):
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name='job_postings')

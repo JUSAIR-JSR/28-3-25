@@ -2,7 +2,7 @@ from django.urls import path
 from .views import interview_list, create_interview, update_interview, delete_interview, interview_detail, manage_reviews, update_review_question, delete_review_question, add_interview_review
 
 urlpatterns = [
-    path('list/', interview_list, name='interview_list'),
+    path('interviews/<int:org_id>/', interview_list, name='interview_list'),
     path('create/', create_interview, name='create_interview'),
     path('update/<int:interview_id>/', update_interview, name='update_interview'),
     path('delete/<int:interview_id>/', delete_interview, name='delete_interview'),
