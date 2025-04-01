@@ -1,0 +1,15 @@
+{% for job in job_postings %}
+    <div class="job-post">
+        <h3>{{ job.title }}</h3>
+        <p>Posted by: 
+            {% if job.posted_by == current_org.user %}
+                Organization Owner
+            {% else %}
+                {{ job.posted_by.get_full_name }} (HR)
+            {% endif %}
+        </p>
+        <p>{{ job.description }}</p>
+    </div>
+{% empty %}
+    <p>No job postings found.</p>
+{% endfor %}

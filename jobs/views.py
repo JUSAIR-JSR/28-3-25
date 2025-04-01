@@ -242,3 +242,62 @@ def job_posting_detail(request, org_id, pk):
         'organization': organization,
         'can_manage': can_manage
     })
+
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from organizations.models import Organization, OrganizationHR
+from jobs.models import JobPosting  # Import JobPosting model
+
+@login_required
+def job_posting_org_view(request, org_id=None):
+    # Get the current organization
+    if org_id:
+        current_org = get_object_or_404(Organization, id=org_id)
+        # Verify HR has access to this org
+        hr_role = OrganizationHR.objects.filter(
+            user=request.user,
+            organization=current_org,
+            is_active=True
+        ).first()
+        if not hr_role and request.user != current_org.user:
+            return redirect('index_dashboard')
+    else:
+        # For organization owners
+        try:
+            current_org = request.user.organization
+        except Organization.DoesNotExist:
+            # For HR staff - get their first assigned organization
+            hr_role = OrganizationHR.objects.filter(
+                user=request.user,
+                is_active=True
+            ).first()
+            if not hr_role:
+                return redirect('index_dashboard')
+            current_org = hr_role.organization
+
+    # Check if the user is the organization owner
+    is_owner = request.user == current_org.user
+
+    # If the user is the owner, they can see all job postings from the organization
+    if is_owner:
+        job_postings = JobPosting.objects.filter(organization=current_org).select_related('posted_by')
+    else:
+        # If the user is HR, show only jobs posted by them
+        job_postings = JobPosting.objects.filter(
+            organization=current_org,
+            posted_by=request.user
+        ).select_related('posted_by')
+
+    # Get all organizations this HR user has access to (for switcher)
+    hr_organizations = OrganizationHR.objects.filter(
+        user=request.user,
+        is_active=True
+    ).select_related('organization')
+
+    return render(request, 'jobs/job_posting_org_view.html', {
+        'job_postings': job_postings,
+        'current_org': current_org,
+        'hr_roles': hr_organizations,  # Changed from hr_organizations to hr_roles
+        'is_owner': is_owner
+    })

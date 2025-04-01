@@ -25,7 +25,7 @@ class JobPosting(models.Model):
     posted_by = models.ForeignKey(User,on_delete=models.SET_NULL,null=True,related_name='posted_jobs')
 
     def save(self, *args, **kwargs):
-        if not self.pk:  # Only set on creation
+        if self.posted_by is None:  # Only set if not assigned
             self.posted_by = self.organization.user
         super().save(*args, **kwargs)
 

@@ -386,3 +386,6 @@ def hr_dashboard(request, org_id=None):
     }
     
     return render(request, 'organizations/hr_dashboard.html', context)
+
+
+

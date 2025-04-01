@@ -22,7 +22,6 @@ class OrganizationHR(models.Model):
     HR_ROLES = [
         ('RECRUITER', 'Recruiter'),
         ('MANAGER', 'HR Manager'),
-        ('ADMIN', 'HR Admin'),
     ]
     
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='hr_roles')

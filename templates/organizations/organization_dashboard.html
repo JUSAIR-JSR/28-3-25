@@ -240,11 +240,34 @@
                 </div>
             </div>
             {% endif %}
+
             {% if request.user.hr_roles.exists %}  <!-- Using your related_name -->
             <div class="py-4 px-2">
                 <a href="{% url 'hr_dashboard' %}" class="shadow-lg shadow-black rounded-md bg-green-500 text-white px-2 py-2">HR Dashboard</a>
             </div>
             {% endif %}
+
+            <!-------------------------------------------------------------------------------------->
+            <!-------------------------------------------------------------------------------------->
+            <!-------------------------------------------------------------------------------------->
+            
+            {% if is_owner or hr_permissions.can_post_jobs %}
+            <div class="mt-4 mb-4">
+                <a href="{% url 'job_posting_org_view' org_id=organization.id %}" 
+                   class="bg-red-500 px-4 py-3 rounded-lg text-white text-md shadow-red-300 hover:bg-red-600 transition-colors duration-200 flex items-center">
+                    <i class="fas fa-building mr-2"></i>
+                    View My Job Posts for {{ organization.name }}
+                </a>
+            </div>
+            {% endif %}
+            
+            <!-------------------------------------------------------------------------------------->
+            <!-------------------------------------------------------------------------------------->
+            <!-------------------------------------------------------------------------------------->
+
+
+
+
             <!-- Recent Job Postings -->
             <div class="mb-10">
                 <div class="flex items-center justify-between mb-6">
