@@ -153,3 +153,14 @@ def delete_review_question(request, question_id):
         'interview_id': interview_id  # Pass interview_id to the template
     })
 
+
+
+
+from django.shortcuts import render
+from .models import Interview  # Replace with your actual interview model
+
+def view_my_interviews(request):
+    # Get interviews for the logged-in user
+    interviews = Interview.objects.filter(job_application__applicant=request.user)
+    
+    return render(request, 'interviews/my_interviews.html', {'interviews': interviews})

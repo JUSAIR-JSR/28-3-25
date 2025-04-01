@@ -172,3 +172,9 @@ def user_profile(request, username):
         'applications': applications,
         'reviews': reviews,
     })
+
+
+
+
+# views.py
+
