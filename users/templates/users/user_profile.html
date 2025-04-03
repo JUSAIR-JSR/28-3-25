@@ -1,154 +1,255 @@
+{% load static tailwind_tags %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ user_profile.username }}'s Profile</title>
+    {% tailwind_css %}
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            color: #333;
-            margin: 0;
-            padding: 0;
-        }
-        .btn{
-            background: #23c1ff;
-            color: black;
-            height: 1.7rem;
-            border: none;
-            margin-left: 3rem;
-            border-radius: 1.5rem;
-            
-        }
-        .container {
-            width: 90%;
-            margin: 0 auto;
-            padding: 20px;
-            background: #fff;
-            border-radius: 5px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        .profile-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .profile-info {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .profile-info div {
-            margin-right: 20px;
-        }
-        .profile-info img {
-            border-radius: 50%;
-            width: 150px;
-            height: 150px;
-        }
-        .sections {
-            display: flex;
-            justify-content: space-between;
-        }
-        .section {
-            width: 48%;
-            background: #f9f9f9;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        h2, h3, h4 {
-            color: #007bff;
-        }
-        ul {
-            list-style: none;
-            padding: 0;
-        }
-        li {
-            background: #fafafa;
-            margin: 10px 0;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            transition: box-shadow 0.3s ease-in-out;
-        }
-        li:hover {
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        a {
-            color: #007bff;
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
-        .star {
-            color: #ff6f00;
-            font-size: 1.3rem;
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
         }
         
+        .star-rating .star {
+            color: #fbbf24;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .profile-image {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .profile-image:hover {
+            transform: scale(1.03);
+        }
+        
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+        }
+        
+        .status-submitted {
+            background-color: #dbeafe;
+            color: #1d4ed8;
+        }
+        
+        .status-review {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-accepted {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+        
+        .status-rejected {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .section-card {
+            transition: all 0.3s ease;
+        }
+        
+        .section-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
-<body>
-    <a href="{% url 'manage_job_applications' %}"><button class="btn">Back to Job Applications</button></a>
-
-    <div class="container">
-        <div class="profile-header">
-            <h2>{{ user_profile.username }}'s Profile</h2>
-        </div>
-        <div class="profile-info">
-            <div>
-                <p><strong>Username:</strong> {{ user_profile.username }}</p>
-                <p><strong>Email:</strong> {{ user_profile.email }}</p>
-            </div>
-            {% if user_profile.profile.profile_image %}
-                <div>
-                    <img src="{{ user_profile.profile.profile_image.url }}" alt="{{ user_profile.username }}">
+<body class="bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
+    <div class="max-w-6xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+        <!-- Profile Header -->
+        <div class="glass-card rounded-2xl shadow-md overflow-hidden mb-8 animate-fade-in">
+            <div class="bg-gradient-to-r from-blue-500 to-indigo-600 p-6 text-white">
+                <div class="flex flex-col md:flex-row items-center justify-between">
+                    <div class="flex items-center space-x-4 mb-4 md:mb-0">
+                        {% if user_profile.profile.profile_image %}
+                        <img src="{{ user_profile.profile.profile_image.url }}" 
+                             alt="{{ user_profile.username }}" 
+                             class="profile-image w-24 h-24 rounded-full object-cover border-4 border-white">
+                        {% else %}
+                        <div class="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center border-4 border-white">
+                            <i class="ri-user-line text-4xl text-gray-500"></i>
+                        </div>
+                        {% endif %}
+                        <div>
+                            <h1 class="text-2xl font-bold">{{ user_profile.username }}</h1>
+                            <p class="text-blue-100">{{ user_profile.email }}</p>
+                        </div>
+                    </div>
+                    <div class="flex space-x-3">
+                        <button class="bg-white text-blue-600 px-4 py-2 rounded-lg font-medium hover:bg-blue-50 transition-colors">
+                            <i class="ri-chat-3-line mr-2"></i> Message
+                        </button>
+                        <button class="bg-white/20 text-white px-4 py-2 rounded-lg font-medium hover:bg-white/30 transition-colors">
+                            <i class="ri-share-line mr-2"></i> Share
+                        </button>
+                    </div>
                 </div>
-            {% endif %}
+            </div>
         </div>
 
-        <div class="sections">
-            <div class="section">
-                <h3>Job Applications</h3>
-                <ul>
-                    {% for application in applications %}
-                        <li>
-                            <p><strong>Job:</strong> {{ application.job.title }}</p>
-                            <p><strong>Status:</strong> {{ application.status }}</p>
-                            {% if application.cv %}
-                                <p><strong>CV:</strong> <a href="{{ application.cv.url }}" target="_blank">Download CV</a></p>
-                            {% endif %}
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
-            
-            <div class="section">
-                <h3>Interview Reviews</h3>
-                <ul>
-                    {% for application in applications %}
-                        <li>
-                            <p><strong>Job:</strong> {{ application.job.title }}</p>
-                            <h4>Reviews</h4>
-                            <ul>
-                                {% for review in reviews %}
-                                    {% if review.interview.job_application == application %}
-                                        <li>
-                                            <p><strong>Question:</strong> {{ review.question.question_text }}</p>
-                                            <p><strong>Rating:</strong> 
-                                                <span>{{ review.rating }}<span class="star">★</span></span>
-                                            </p>
-                                            <p><strong>Reviewed At:</strong> {{ review.created_at|date:"b. d, Y, P" }}</p>
-                                        </li>
+        <!-- Main Content -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Job Applications Section -->
+            <div class="bg-white rounded-2xl shadow-md overflow-hidden section-card animate-fade-in" style="animation-delay: 0.1s">
+                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 border-b">
+                    <h3 class="text-xl font-semibold flex items-center">
+                        <i class="ri-briefcase-line mr-3 text-blue-500"></i>
+                        Job Applications
+                        <span class="ml-auto bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                            {{ applications.count }}
+                        </span>
+                    </h3>
+                </div>
+                <div class="p-6">
+                    {% if applications %}
+                    <div class="space-y-6">
+                        {% for application in applications %}
+                        <div class="border rounded-lg p-4 hover:border-blue-200 transition-colors">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h4 class="font-medium text-lg">{{ application.job.title }}</h4>
+                                    <p class="text-gray-600 text-sm">{{ application.job.company }}</p>
+                                </div>
+                                <span class="status-badge 
+                                    {% if application.status == 'Submitted' %}status-submitted
+                                    {% elif application.status == 'Under Review' %}status-review
+                                    {% elif application.status == 'Accepted' %}status-accepted
+                                    {% else %}status-rejected{% endif %}">
+                                    {{ application.status }}
+                                </span>
+                            </div>
+                            
+                            <div class="mt-3 pt-3 border-t border-gray-100">
+                                <div class="flex justify-between items-center text-sm">
+                                    <span class="text-gray-500">
+                                        Applied on {{ application.applied_at|date:"M d, Y" }}
+                                    </span>
+                                    {% if application.cv %}
+                                    <a href="{{ application.cv.url }}" target="_blank" 
+                                       class="text-blue-600 hover:text-blue-800 flex items-center">
+                                        <i class="ri-file-download-line mr-1"></i> Download CV
+                                    </a>
                                     {% endif %}
-                                {% endfor %}
-                            </ul>
-                        </li>
-                    {% endfor %}
-                </ul>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-8">
+                        <div class="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                            <i class="ri-briefcase-line text-2xl text-gray-400"></i>
+                        </div>
+                        <p class="text-gray-500">No job applications yet</p>
+                        <a href="#" class="mt-4 inline-block text-blue-600 hover:text-blue-800 text-sm font-medium">
+                            Browse jobs <i class="ri-arrow-right-line"></i>
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Interview Reviews Section -->
+            <div class="bg-white rounded-2xl shadow-md overflow-hidden section-card animate-fade-in" style="animation-delay: 0.2s">
+                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 border-b">
+                    <h3 class="text-xl font-semibold flex items-center">
+                        <i class="ri-feedback-line mr-3 text-indigo-500"></i>
+                        Interview Reviews
+                        <span class="ml-auto bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                            {{ reviews.count }}
+                        </span>
+                    </h3>
+                </div>
+                <div class="p-6">
+                    {% if reviews %}
+                    <div class="space-y-6">
+                        {% for application in applications %}
+                            {% if application.reviews.exists %}
+                            <div class="border rounded-lg p-4 hover:border-indigo-200 transition-colors">
+                                <h4 class="font-medium text-lg mb-3">{{ application.job.title }}</h4>
+                                
+                                <div class="space-y-4">
+                                    {% for review in reviews %}
+                                        {% if review.interview.job_application == application %}
+                                        <div class="border-l-2 border-indigo-200 pl-4 py-1">
+                                            <div class="flex justify-between items-start">
+                                                <h5 class="font-medium">{{ review.question.question_text }}</h5>
+                                                <div class="star-rating flex items-center">
+                                                    <span class="text-amber-400">{{ review.rating }}</span>
+                                                    <span class="star">★</span>
+                                                </div>
+                                            </div>
+                                            <p class="text-gray-500 text-sm mt-1">
+                                                Reviewed on {{ review.created_at|date:"M d, Y" }}
+                                            </p>
+                                        </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-8">
+                        <div class="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                            <i class="ri-feedback-line text-2xl text-gray-400"></i>
+                        </div>
+                        <p class="text-gray-500">No interview reviews yet</p>
+                        <p class="text-sm text-gray-400 mt-1">Reviews will appear after completed interviews</p>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
-
     </div>
+
+    <script>
+        // Add hover effects to cards
+        document.querySelectorAll('.section-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.boxShadow = '0 15px 30px rgba(0, 0, 0, 0.1)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+            });
+        });
+
+        // Animate elements when they come into view
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = 1;
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.animate-fade-in').forEach(el => {
+            el.style.opacity = 0;
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            observer.observe(el);
+        });
+    </script>
 </body>
 </html>

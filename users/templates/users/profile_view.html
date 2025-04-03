@@ -1,100 +1,241 @@
+{% load static tailwind_tags %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>View User Profile</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ user.username|upper }} | Professional Profile</title>
+    {% tailwind_css %}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            margin: 0;
-            padding: 0;
+        /* Particle Animation */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
         }
-        .container {
-            width: 80%;
-            margin: 0 auto;
-            background: #fff;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-        }
-        h2 {
-            color: #333;
-            text-align: center;
-            margin-top: 0;
-        }
-        .profile-section {
-            margin-bottom: 20px;
-        }
-        .profile-section img {
-            display: block;
-            margin: 0 auto;
+        
+        .particle {
+            position: absolute;
+            background: rgba(200, 200, 255, 0.3);
             border-radius: 50%;
-            object-fit: cover;
-            
+            animation: float linear infinite;
         }
-        .profile-section p {
-            font-size: 16px;
-            color: #666;
-            text-align: center;
+        
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-1000px) rotate(720deg); opacity: 0; }
         }
-        .profile-section p strong {
-            color: #333;
+        
+        /* Premium Card Styling */
+        .profile-card {
+            background: #e6e6e6cf;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 30px #00000014;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid #ffffff4d;
         }
-        .profile-links {
-            text-align: center;
-            margin-top: 20px;
+        
+        .profile-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
         }
-        .profile-links a {
-            text-decoration: none;
-            color: #007bff;
-            margin-right: 10px;
+        
+        .section-card {
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            transition: all 0.3s ease;
         }
-        .profile-links a:hover {
-            text-decoration: underline;
+        
+        .section-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+        }
+        
+        .skill-pill {
+            transition: all 0.2s ease;
+            background: linear-gradient(135deg, rgba(236, 239, 255, 0.8) 0%, rgba(255, 255, 255, 0.9) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        
+        .skill-pill:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+        }
+        
+        .edit-btn {
+            transition: all 0.3s ease;
+            opacity: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(245, 245, 255, 0.95) 100%);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .image-container:hover .edit-btn {
+            opacity: 1;
+        }
+        
+        /* Background */
+        body {
+            background: linear-gradient(135deg, #f9f9ff 0%, #f0f4ff 100%);
+            min-height: 100vh;
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h2>User Profile</h2>
-        <div class="profile-section">
-            <p><strong>Profile Image:</strong>
-                {% if profile.profile_image %}
-                    <img width="150" height="150" src="{{ profile.profile_image.url }}" alt="Profile Image">
-                {% else %}
-                    No profile image available.
-                {% endif %}
-            </p>
-        </div>
-        <div class="profile-section">
-            <p><strong>Banner Image:</strong>
+<body class="min-h-screen flex items-center justify-center p-4 font-sans antialiased">
+    <!-- Particle Animation -->
+    <div class="particles" id="particles"></div>
+    
+    <div class="w-full max-w-5xl">
+        <!-- Main Profile Card -->
+        <div class="profile-card rounded-2xl overflow-hidden">
+            <!-- Banner Section with Edit Button -->
+            <div class="relative h-64 bg-gradient-to-r from-blue-50 to-indigo-50 image-container">
                 {% if profile.banner_image %}
-                    <img width="550" height="250" src="{{ profile.banner_image.url }}" alt="Banner Image">
+                    <img class="w-full h-full object-cover" src="{{ profile.banner_image.url }}" alt="Banner Image">
                 {% else %}
-                    No banner image available.
+                    <div class="w-full h-full flex items-center justify-center text-indigo-200">
+                        <i class="fas fa-image fa-4x opacity-50"></i>
+                    </div>
                 {% endif %}
-            </p>
-        </div>
-        <div class="profile-section">
-            <p><strong>Certifications:</strong> {{ profile.certifications }}</p>
-        </div>
-        <div class="profile-section">
-            <p><strong>Qualifications:</strong> {{ profile.qualifications }}</p>
-        </div>
-        <div class="profile-section">
-            <p><strong>Skills:</strong> {{ profile.skills.all|join:", " }}</p>
-        </div>
-        <div class="profile-section">
-            <p><strong>Location:</strong> {{ profile.location }}</p>
-        </div>
-        <div class="profile-links">
-            <a href="{% url 'profile_image_update' %}">Edit Profile Image</a>
-            <a href="{% url 'banner_image_update' %}">Edit Banner Image</a>
-            <a href="{% url 'skills_select' %}">Edit Skills</a>
-            <a href="{% url 'personal_details_update' %}">Edit Personal Details</a>
-            <a href="{% url 'user_dashboard' %}">Back to home</a>
-
+                <a href="{% url 'banner_image_update' %}" class="edit-btn absolute top-5 right-5 text-indigo-600 p-3 rounded-full hover:text-indigo-700">
+                    <i class="fas fa-camera"></i>
+                </a>
+            </div>
+            
+            <!-- Profile Header -->
+            <div class="px-10 py-8 relative">
+                <div class="absolute -top-16 left-10 w-36 h-36 rounded-full border-4 border-white bg-gradient-to-br from-blue-100 to-indigo-100 shadow-xl image-container">
+                    {% if profile.profile_image %}
+                        <img class="w-full h-full object-cover rounded-full" src="{{ profile.profile_image.url }}" alt="Profile Image">
+                    {% else %}
+                        <div class="w-full h-full flex items-center justify-center text-indigo-300 rounded-full">
+                            <i class="fas fa-user fa-4x"></i>
+                        </div>
+                    {% endif %}
+                    <a href="{% url 'profile_image_update' %}" class="edit-btn absolute bottom-1 right-1 text-indigo-600 p-2 rounded-full hover:text-indigo-700">
+                        <i class="fas fa-camera text-sm"></i>
+                    </a>
+                </div>
+                
+                <div class="ml-44 pt-4">
+                    <h1 class="text-3xl font-bold text-gray-800 tracking-tight">{{ user.username|upper }}</h1>
+                    {% if profile.location %}
+                        <p class="text-gray-600 mt-2 flex items-center">
+                            <i class="fas fa-map-marker-alt mr-2 text-indigo-400"></i>
+                            <span class="font-medium">{{ profile.location }}</span>
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Profile Details -->
+            <div class="px-10 pb-8 grid md:grid-cols-2 gap-8">
+                <!-- Left Column -->
+                <div class="space-y-6">
+                    {% if profile.qualifications %}
+                    <div class="section-card p-6 rounded-xl">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-indigo-50 p-3 rounded-xl mr-4">
+                                <i class="fas fa-graduation-cap text-indigo-500 text-xl"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold text-gray-800">Qualifications</h3>
+                        </div>
+                        <p class="text-gray-700 pl-16 leading-relaxed">{{ profile.qualifications }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    {% if profile.certifications %}
+                    <div class="section-card p-6 rounded-xl">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-amber-50 p-3 rounded-xl mr-4">
+                                <i class="fas fa-certificate text-amber-500 text-xl"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold text-gray-800">Certifications</h3>
+                        </div>
+                        <p class="text-gray-700 pl-16 leading-relaxed">{{ profile.certifications }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Right Column -->
+                <div class="space-y-6">
+                    {% if profile.skills.all %}
+                    <div class="section-card p-6 rounded-xl">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-emerald-50 p-3 rounded-xl mr-4">
+                                <i class="fas fa-tools text-emerald-500 text-xl"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold text-gray-800">Skills</h3>
+                        </div>
+                        <div class="flex flex-wrap gap-3 pl-16">
+                            {% for skill in profile.skills.all %}
+                                <span class="skill-pill px-4 py-1.5 text-indigo-700 rounded-full text-sm font-medium">
+                                    {{ skill.name }}
+                                </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Action Buttons -->
+                    <div class="section-card p-6 rounded-xl">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-purple-50 p-3 rounded-xl mr-4">
+                                <i class="fas fa-sliders-h text-purple-500 text-xl"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold text-gray-800">Quick Actions</h3>
+                        </div>
+                        <div class="flex flex-wrap gap-4 pl-16">
+                            <a href="{% url 'skills_select' %}" class="flex items-center justify-center w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-100 transition-all hover:-translate-y-1" title="Edit Skills">
+                                <i class="fas fa-tools text-lg"></i>
+                            </a>
+                            <a href="{% url 'personal_details_update' %}" class="flex items-center justify-center w-12 h-12 bg-amber-50 text-amber-600 rounded-xl hover:bg-amber-100 transition-all hover:-translate-y-1" title="Edit Details">
+                                <i class="fas fa-user-edit text-lg"></i>
+                            </a>
+                            <a href="{% url 'user_dashboard' %}" class="flex items-center justify-center w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl hover:bg-emerald-100 transition-all hover:-translate-y-1" title="Dashboard">
+                                <i class="fas fa-home text-lg"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+
+    <script>
+        // Particle Animation Script
+        document.addEventListener('DOMContentLoaded', function() {
+            const particles = document.getElementById('particles');
+            const particleCount = 30;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Random properties
+                const size = Math.random() * 15 + 5;
+                const posX = Math.random() * window.innerWidth;
+                const posY = Math.random() * window.innerHeight + window.innerHeight;
+                const duration = Math.random() * 20 + 10;
+                const delay = Math.random() * 5;
+                const opacity = Math.random() * 0.4 + 0.1;
+                
+                // Apply styles
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${posX}px`;
+                particle.style.top = `${posY}px`;
+                particle.style.animationDuration = `${duration}s`;
+                particle.style.animationDelay = `${delay}s`;
+                particle.style.opacity = opacity;
+                
+                particles.appendChild(particle);
+            }
+        });
+    </script>
 </body>
 </html>

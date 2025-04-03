@@ -1,71 +1,89 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Interview List</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            color: #333;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 20px;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        h2 {
-            text-align: center;
-            color: #007bff;
-        }
-        ul {
-            list-style: none;
-            padding: 0;
-        }
-        li {
-            background: #fff;
-            margin: 10px 0;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        .btn {
-            display: inline-block;
-            padding: 10px 15px;
-            background: #007bff;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            margin-right: 10px;
-        }
-        .btn-delete {
-            background: #d9534f;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview List - {{ organization.name }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 </head>
-<body>
-    <div class="container">
-        <h2>Interviews for {{ organization.name }}</h2>
+<body class="bg-gray-50 min-h-screen">
+    <div class="max-w-4xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-blue-600 mb-2 flex items-center justify-center">
+                <i class="ri-calendar-event-line mr-3"></i>
+                Interviews for {{ organization.name }}
+            </h1>
+            <p class="text-gray-600">Manage and join scheduled interviews</p>
+        </div>
 
-        {% if interviews %}
-            <ul>
+        <!-- Interview List -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            {% if interviews %}
+            <ul class="divide-y divide-gray-200">
                 {% for interview in interviews %}
-                    <li>
-                        <strong>Job:</strong> {{ interview.job_application.job.title }} <br>
-                        <strong>Applicant:</strong> {{ interview.job_application.applicant.username }} <br>
-                        <strong>Scheduled Time:</strong> {{ interview.scheduled_time }} <br>
-                        <strong>Interview Link:</strong> <a href="{{ interview.interview_link }}" target="_blank">Join</a> <br>
-                    </li>
+                <li class="p-6 hover:bg-gray-50 transition-colors duration-150">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Interview Details -->
+                        <div>
+                            <div class="flex items-center mb-3">
+                                <i class="ri-briefcase-line text-blue-500 mr-2"></i>
+                                <h3 class="font-semibold text-lg text-gray-800">
+                                    {{ interview.job_application.job.title }}
+                                </h3>
+                            </div>
+                            
+                            <div class="space-y-2">
+                                <div class="flex items-center">
+                                    <i class="ri-user-line text-gray-500 mr-2"></i>
+                                    <span class="text-gray-700">
+                                        <span class="font-medium">Applicant:</span> 
+                                        {{ interview.job_application.applicant.username }}
+                                    </span>
+                                </div>
+                                
+                                <div class="flex items-center">
+                                    <i class="ri-time-line text-gray-500 mr-2"></i>
+                                    <span class="text-gray-700">
+                                        <span class="font-medium">Scheduled:</span> 
+                                        {{ interview.scheduled_time|date:"M d, Y H:i" }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Actions -->
+                        <div class="flex flex-col justify-between">
+                            <div class="flex items-center mb-4">
+                                <i class="ri-link text-gray-500 mr-2"></i>
+                                <a href="{{ interview.interview_link }}" target="_blank" 
+                                   class="text-blue-600 hover:text-blue-800 hover:underline flex items-center">
+                                    Join Interview
+                                    <i class="ri-external-link-line ml-1"></i>
+                                </a>
+                            </div>
+                            
+                            
+                        </div>
+                    </div>
+                </li>
                 {% endfor %}
             </ul>
-        {% else %}
-            <p>No interviews scheduled yet.</p>
-        {% endif %}
+            {% else %}
+            <!-- Empty State -->
+            <div class="text-center py-12">
+                <div class="mx-auto w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                    <i class="ri-calendar-todo-line text-3xl text-gray-400"></i>
+                </div>
+                <h3 class="text-lg font-medium text-gray-700 mb-1">No interviews scheduled</h3>
+                <p class="text-gray-500">When you schedule interviews, they will appear here.</p>
+                <a href="#" class="mt-4 inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                    <i class="ri-add-line mr-2"></i> Schedule Interview
+                </a>
+            </div>
+            {% endif %}
+        </div>
     </div>
 </body>
 </html>

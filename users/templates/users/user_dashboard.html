@@ -210,12 +210,7 @@
                 </div>
                 {% endif %}
                 
-                <div class="pt-4 border-t border-gray-200">
-                    <a href="{% url 'user_logout' %}" class="flex items-center space-x-2 text-red-600 hover:text-red-800">
-                        <i class="fas fa-sign-out-alt w-5"></i>
-                        <span>Logout</span>
-                    </a>
-                </div>
+              
             </div>
         </div>
     </div>
@@ -229,8 +224,11 @@
                         <i class="fas fa-paper-plane text-blue-600 text-xl"></i>
                     </div>
                     <div>
-                        <p class="text-gray-500 text-sm font-medium">Applications Sent</p>
-                        <p class="text-2xl font-bold text-gray-800">{{ applications_count }}</p>
+                        <a href="{% url 'user_job_applications' %}" class="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center">
+                    
+                            <p class="text-gray-500 text-sm font-medium">Applications Sent</p>
+                            <p class="text-2xl font-bold text-gray-800">{{ applications_count }}</p>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -282,10 +280,9 @@
                     <i class="fas fa-bullhorn text-blue-500 mr-3"></i>
                     Available Job Postings
                 </h2>
-                <a href="{% url 'user_job_applications' %}" class="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center">
-                    View all applications <i class="fas fa-chevron-right ml-1"></i>
-                </a>
-            </div>
+                <a href="{% url 'joblist_userdashboard' %}" class="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center">
+                    View all <i class="fas fa-chevron-right ml-1"></i>
+                </a>            </div>
             
             {% if job_postings %}
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -432,6 +429,17 @@
                     <div>
                         <h3 class="font-medium text-gray-900 mb-1">Messages</h3>
                         <p class="text-sm text-gray-500">Communicate with employers</p>
+                    </div>
+                </a>
+
+                  
+                <a href="{% url 'user_logout' %}" class="bg-white p-5 rounded-lg shadow-sm border border-gray-100 hover:border-red-200 hover:shadow-md transition-all flex items-start hover-grow">
+                    <div class="bg-red-100 p-3 rounded-lg mr-4">
+                        <i class="fas fa-sign-out-alt text-red-600"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-medium text-gray-900 mb-1">Logout</h3>
+                        <p class="text-sm text-gray-500">Sign out of your account</p>
                     </div>
                 </a>
             </div>

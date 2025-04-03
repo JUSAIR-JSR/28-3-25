@@ -1,109 +1,113 @@
+{% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Manage Job Applications</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            color: #333;
-            margin: 0;
-            padding: 0;
-        }
-        header {
-            background-color: #007bff;
-            color: #fff;
-            padding: 10px 0;
-            text-align: center;
-        }
-        h3 {
-            color: #007bff;
-            text-align: center;
-            margin: 20px 0;
-        }
-        .container {
-            width: 80%;
-            margin: 0 auto;
-            padding: 20px;
-            background: #fff;
-            border-radius: 5px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        ul {
-            list-style: none;
-            padding: 0;
-        }
-        li {
-            background: #fafafa;
-            margin: 10px 0;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            transition: box-shadow 0.3s ease-in-out;
-        }
-        li:hover {
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        a {
-            color: #007bff;
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-        button {
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin: 5px 0;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .nav-links {
-            display: flex;
-            justify-content: space-between;
-            margin: 20px 0;
-        }
-        footer {
-            text-align: center;
-            margin-top: 20px;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Job Applications - {{ organization.name }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 </head>
-<body>
-    
-    <header>
-        <h2>Manage Job Applications - {{ organization.name }}</h2>
-    </header>
-    <div class="container">
-        <h3>Job Applications</h3>
-        <ul>
-            {% for application in job_applications %}
-                <li>
-                    Job: {{ application.job.title }} <br>
-                    Applicant: <a href="{% url 'user_profile' application.applicant.username %}">{{ application.applicant.username }}</a> <br>
-                    Status: {{ application.status }}
-                    {% if is_owner or request.user == application.job.user %}
-                        <form method="post" action="{% url 'manage_job_applications' org_id=organization.id %}">
-                            {% csrf_token %}
-                            <input type="hidden" name="application_id" value="{{ application.id }}">
-                            {{ form.status }}
-                            <button type="submit">Update Status</button>
-                        </form>
-                    {% endif %}
-                </li>
-            {% endfor %}
-        </ul>
-        <div class="nav-links">
-            <a href="{% url 'organization_dashboard' %}">Back to Dashboard</a>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-blue-600 text-white shadow-md">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <i class="ri-briefcase-line text-2xl"></i>
+                    <h2 class="text-xl font-bold">Manage Job Applications - {{ organization.name }}</h2>
+                </div>
+                
+            </div>
         </div>
-    </div>
-    <footer>
-        <p>&copy; 2025 Organization Dashboard. All rights reserved.</p>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <!-- Section Header -->
+            <div class="bg-blue-50 px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-blue-800 flex items-center">
+                    <i class="ri-file-list-2-line mr-2"></i> Job Applications
+                </h3>
+            </div>
+
+            <!-- Applications List -->
+            <div class="p-6">
+                {% if job_applications %}
+                <ul class="space-y-4">
+                    {% for application in job_applications %}
+                    <li class="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:shadow-md transition-shadow">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <!-- Job Info -->
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Job</p>
+                                <p class="font-semibold text-blue-600">{{ application.job.title }}</p>
+                            </div>
+                            
+                            <!-- Applicant Info -->
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Applicant</p>
+                                <a href="{% url 'user_profile' application.applicant.username %}" 
+                                   class="font-semibold text-blue-600 hover:underline flex items-center">
+                                    <i class="ri-user-line mr-1"></i> {{ application.applicant.username }}
+                                </a>
+                            </div>
+                            
+                            <!-- Status Info -->
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Status</p>
+                                <div class="flex items-center justify-between">
+                                    <span class="px-2 py-1 rounded-full text-xs font-medium 
+                                        {% if application.status == 'Submitted' %}bg-blue-100 text-blue-800
+                                        {% elif application.status == 'Under Review' %}bg-yellow-100 text-yellow-800
+                                        {% elif application.status == 'Interview' %}bg-purple-100 text-purple-800
+                                        {% elif application.status == 'Accepted' %}bg-green-100 text-green-800
+                                        {% else %}bg-red-100 text-red-800{% endif %}">
+                                        {{ application.status }}
+                                    </span>
+                                    
+                                    {% if is_owner or request.user == application.job.user %}
+                                    <form method="post" action="{% url 'manage_job_applications' org_id=organization.id %}" 
+                                          class="flex items-center space-x-2">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="application_id" value="{{ application.id }}">
+                                        <select name="status" class="text-sm border border-gray-300 rounded px-2 py-1 focus:ring-blue-500 focus:border-blue-500">
+                                            <option value="Submitted" {% if application.status == 'Submitted' %}selected{% endif %}>Submitted</option>
+                                            <option value="Under Review" {% if application.status == 'Under Review' %}selected{% endif %}>Under Review</option>
+                                            <option value="Interview" {% if application.status == 'Interview' %}selected{% endif %}>Interview</option>
+                                            <option value="Accepted" {% if application.status == 'Accepted' %}selected{% endif %}>Accepted</option>
+                                            <option value="Rejected" {% if application.status == 'Rejected' %}selected{% endif %}>Rejected</option>
+                                        </select>
+                                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm flex items-center">
+                                            <i class="ri-refresh-line mr-1"></i> Update
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <div class="text-center py-8">
+                    <div class="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                        <i class="ri-file-search-line text-2xl text-gray-400"></i>
+                    </div>
+                    <h4 class="text-lg font-medium text-gray-700">No applications found</h4>
+                    <p class="text-gray-500 mt-1">When candidates apply to your jobs, they'll appear here.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 mt-8 py-4">
+        <div class="container mx-auto px-4 text-center text-gray-500 text-sm">
+            <p>&copy; 2025 Organization Dashboard. All rights reserved.</p>
+        </div>
     </footer>
 </body>
 </html>

@@ -1,135 +1,400 @@
+{% load static tailwind_tags %}
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    {% tailwind_css %}
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat Room</title>
-    <link
-    href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css"
-    rel="stylesheet"
-    />
-    <link rel="stylesheet" href="{% static 'css/chat_room.css' %}">
-</head>
-<body>
-
-    <h1>Chat with {{ other_participant.username }}</h1>
-    
-    <div id="chat-box">
-        <div class="btnchat">
-            <button class="btn-back" onclick="history.back()"><i class="ri-arrow-left-line"></i></button>
-        </div>
-        <div class="messages-container">
-            {% for message in messages %}
-                <div class="message {% if message.sender == request.user %}sent{% else %}received{% endif %}" data-message-id="{{ message.id }}">
-                    <span class="message-text">{{ message.text }}</span>
-                    <span class="timestamp">{{ message.timestamp|date:"H:i" }}</span>
-
-                    {% if message.sender == request.user %}
-                        <!-- Three-dot Menu -->
-                        <div class="menu-container">
-                            <button class="menu-btn" onclick="toggleMenu(this)">⋮</button>
-                            <div class="message-actions hidden">
-                                <button class="text-btn edit-btn" onclick="editMessage(this)"><i class="ri-pencil-line"></i>Edit</button>
-                                <form method="POST" class="delete-form">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="action" value="delete">
-                                    <input type="hidden" name="message_id" value="{{ message.id }}">
-                                    <button class="text-btn" type="submit"><i class="ri-delete-bin-6-line"></i>Delete</button>
-                                </form>
-                            </div>
-                        </div>
-                    {% endif %}
-                </div>
-            {% endfor %}
-        </div>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <script src="https://unpkg.com/@heroicons/vue@1.0.6/dist/heroicons.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
         
-        <form method="POST" class="chat-input">
-            {% csrf_token %}
-            <input type="hidden" name="action" value="send">
-            <input type="text" name="message" placeholder="Type a message">
-            <button type="submit"><i class="ri-send-plane-2-fill"></i></button>
-        </form>
+        /* Custom Scrollbar */
+        #chat-box {
+            scrollbar-width: thin;
+            scrollbar-color: #3b82f6 #e5e7eb;
+        }
+        
+        #chat-box::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        #chat-box::-webkit-scrollbar-track {
+            background: #e5e7eb;
+            border-radius: 10px;
+        }
+        
+        #chat-box::-webkit-scrollbar-thumb {
+            background-color: #3b82f6;
+            border-radius: 10px;
+            border: 2px solid #e5e7eb;
+        }
+        
+        #chat-box::-webkit-scrollbar-thumb:hover {
+            background-color: #2563eb;
+        }
+        
+        /* Smooth scrolling */
+        .smooth-scroll {
+            scroll-behavior: smooth;
+        }
+        
+        /* Message animations */
+        .message-enter {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .message-enter-active {
+            opacity: 1;
+            transform: translateY(0);
+            transition: all 0.3s ease;
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .bounce {
+            animation: bounce 0.5s;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <!-- Particles Background -->
+    <div id="particles-js"></div>
+    
+    <div class="w-full max-w-md mx-4">
+        <div class="bg-white rounded-xl shadow-xl overflow-hidden transform transition-all duration-300 hover:shadow-2xl">
+            <!-- Chat Header -->
+            <div class="bg-gradient-to-r from-cyan-500 to-blue-500 p-4 text-white flex items-center">
+                <button onclick="history.back()" class="mr-3 bg-white bg-opacity-20 p-2 rounded-full hover:bg-opacity-30 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+                <div>
+                    <h1 class="text-xl font-semibold">Chat with {{ other_participant.username }}</h1>
+                    <p class="text-xs opacity-80">Online</p>
+                </div>
+            </div>
+            
+            <!-- Messages Container -->
+            <div id="chat-box" class="h-[600px] overflow-y-auto p-4 bg-gray-50 flex flex-col space-y-3 smooth-scroll">
+                {% for message in messages %}
+                <div class="message {% if message.sender == request.user %}sent{% else %}received{% endif %} fade-in" data-message-id="{{ message.id }}">
+                    <div class="{% if message.sender == request.user %}bg-blue-500 text-white self-end{% else %}bg-white border border-gray-200 self-start{% endif %} rounded-2xl px-4 py-2 max-w-xs shadow-sm relative group">
+                        <p class="message-text">{{ message.text }}</p>
+                        <div class="flex items-center justify-end mt-1 space-x-2">
+                            <span class="text-xs opacity-70 {% if message.sender == request.user %}text-blue-100{% else %}text-gray-500{% endif %}">{{ message.timestamp|date:"H:i" }}</span>
+                            {% if message.sender == request.user %}
+                            <button class="menu-btn opacity-0 group-hover:opacity-70 transition-opacity duration-200 focus:outline-none" onclick="toggleMenu(this)">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
+                                </svg>
+                            </button>
+                            {% endif %}
+                        </div>
+                        
+                        {% if message.sender == request.user %}
+                        <div class="message-actions absolute right-0 top-8 bg-white rounded-lg shadow-lg py-1 z-10 hidden transform transition-all duration-150 origin-top-right">
+                            <button class="edit-btn w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center" onclick="editMessage(this)">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                                </svg>
+                                Edit
+                            </button>
+                            <form method="POST" class="delete-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="delete">
+                                <input type="hidden" name="message_id" value="{{ message.id }}">
+                                <button class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center" type="submit">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                    </svg>
+                                    Delete
+                                </button>
+                            </form>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+                <!-- Empty div for auto-scrolling to bottom -->
+                <div id="scroll-anchor"></div>
+            </div>
+            
+            <!-- Message Input -->
+            <form method="POST" class="chat-input bg-white border-t border-gray-200 p-3 flex items-center">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="send">
+                <input type="text" name="message" placeholder="Type a message..." class="flex-1 border border-gray-300 rounded-full py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <button type="submit" class="ml-2 bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 bounce-on-click">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </form>
+        </div>
     </div>
 
     <script>
-     function editMessage(button) {
-    let messageDiv = button.closest('.message');
-    let messageText = messageDiv.querySelector('.message-text');
-    let messageId = messageDiv.getAttribute('data-message-id');
-
-    let originalText = messageText.textContent; // Store original text
-
-    let inputField = document.createElement('input');
-    inputField.type = 'text';
-    inputField.value = originalText;
-    inputField.classList.add('edit-input');
-
-    messageText.replaceWith(inputField);
-    inputField.focus();
-
-    // Close the menu when editing starts
-    let menu = messageDiv.querySelector('.message-actions');
-    if (menu) {
-        menu.classList.add('hidden');
-    }
-
-    function revertEdit() {
-        let newSpan = document.createElement('span');
-        newSpan.classList.add('message-text');
-        newSpan.textContent = originalText;
-        inputField.replaceWith(newSpan);
-        document.removeEventListener('click', handleBlur);
-    }
-
-    function handleBlur(event) {
-        if (!event.target.closest('.edit-input') && !event.target.closest('.menu-btn')) {
-            revertEdit();
-        }
-    }
-
-    inputField.addEventListener('keypress', function (event) {
-        if (event.key === 'Enter') {
-            saveEditedMessage(inputField, messageId);
-            document.removeEventListener('click', handleBlur);
-        }
-    });
-
-    setTimeout(() => {
-        document.addEventListener('click', handleBlur);
-    }, 100); // Delay to prevent immediate hiding
-}
-
-function toggleMenu(button) {
-    let menu = button.nextElementSibling;
-    let allMenus = document.querySelectorAll('.message-actions');
-
-    // Close all other menus before opening a new one
-    allMenus.forEach(m => {
-        if (m !== menu) {
-            m.classList.add('hidden');
-        }
-    });
-
-    // Toggle menu visibility
-    menu.classList.toggle('hidden');
-
-    // Prevent immediate hiding when clicking the menu button
-    setTimeout(() => {
-        document.addEventListener('click', closeMenus);
-    }, 100);
-}
-
-function closeMenus(event) {
-    if (!event.target.closest('.menu-btn') && !event.target.closest('.message-actions')) {
-        document.querySelectorAll('.message-actions').forEach(menu => {
-            menu.classList.add('hidden');
+        // Initialize particles.js
+        document.addEventListener('DOMContentLoaded', function() {
+            particlesJS('particles-js', {
+                "particles": {
+                    "number": {
+                        "value": 80,
+                        "density": {
+                            "enable": true,
+                            "value_area": 800
+                        }
+                    },
+                    "color": {
+                        "value": "#3b82f6"
+                    },
+                    "shape": {
+                        "type": "circle",
+                        "stroke": {
+                            "width": 0,
+                            "color": "#000000"
+                        },
+                        "polygon": {
+                            "nb_sides": 5
+                        }
+                    },
+                    "opacity": {
+                        "value": 0.3,
+                        "random": false,
+                        "anim": {
+                            "enable": false,
+                            "speed": 1,
+                            "opacity_min": 0.1,
+                            "sync": false
+                        }
+                    },
+                    "size": {
+                        "value": 3,
+                        "random": true,
+                        "anim": {
+                            "enable": false,
+                            "speed": 40,
+                            "size_min": 0.1,
+                            "sync": false
+                        }
+                    },
+                    "line_linked": {
+                        "enable": true,
+                        "distance": 150,
+                        "color": "#93c5fd",
+                        "opacity": 0.2,
+                        "width": 1
+                    },
+                    "move": {
+                        "enable": true,
+                        "speed": 2,
+                        "direction": "none",
+                        "random": false,
+                        "straight": false,
+                        "out_mode": "out",
+                        "bounce": false,
+                        "attract": {
+                            "enable": false,
+                            "rotateX": 600,
+                            "rotateY": 1200
+                        }
+                    }
+                },
+                "interactivity": {
+                    "detect_on": "canvas",
+                    "events": {
+                        "onhover": {
+                            "enable": true,
+                            "mode": "grab"
+                        },
+                        "onclick": {
+                            "enable": true,
+                            "mode": "push"
+                        },
+                        "resize": true
+                    },
+                    "modes": {
+                        "grab": {
+                            "distance": 140,
+                            "line_linked": {
+                                "opacity": 0.5
+                            }
+                        },
+                        "bubble": {
+                            "distance": 400,
+                            "size": 40,
+                            "duration": 2,
+                            "opacity": 8,
+                            "speed": 3
+                        },
+                        "repulse": {
+                            "distance": 200,
+                            "duration": 0.4
+                        },
+                        "push": {
+                            "particles_nb": 4
+                        },
+                        "remove": {
+                            "particles_nb": 2
+                        }
+                    }
+                },
+                "retina_detect": true
+            });
+            
+            // Add bounce animation to send button
+            document.querySelector('.bounce-on-click').addEventListener('click', function() {
+                this.classList.add('animate-bounce');
+                setTimeout(() => {
+                    this.classList.remove('animate-bounce');
+                }, 1000);
+            });
+            
+            // Scroll to bottom initially
+            scrollToBottom();
+            
+            // Set up MutationObserver to detect new messages
+            const chatBox = document.getElementById('chat-box');
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.addedNodes.length) {
+                        // Only scroll if we're near the bottom
+                        const isNearBottom = isScrollNearBottom();
+                        if (isNearBottom) {
+                            scrollToBottom();
+                        }
+                    }
+                });
+            });
+            
+            observer.observe(chatBox, { childList: true, subtree: true });
         });
-        document.removeEventListener('click', closeMenus);
-    }
-}
 
+        function isScrollNearBottom() {
+            const chatBox = document.getElementById('chat-box');
+            const threshold = 100; // pixels from bottom
+            return chatBox.scrollHeight - chatBox.scrollTop - chatBox.clientHeight <= threshold;
+        }
 
+        function scrollToBottom() {
+            const chatBox = document.getElementById('chat-box');
+            const scrollAnchor = document.getElementById('scroll-anchor');
+            scrollAnchor.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function toggleMenu(button) {
+            const menu = button.parentElement.nextElementSibling;
+            const allMenus = document.querySelectorAll('.message-actions');
+            
+            // Close all other menus
+            allMenus.forEach(m => {
+                if (m !== menu) m.classList.add('hidden');
+            });
+            
+            // Toggle current menu
+            menu.classList.toggle('hidden');
+            
+            // Close menu when clicking outside
+            if (!menu.classList.contains('hidden')) {
+                setTimeout(() => {
+                    document.addEventListener('click', function closeMenu(e) {
+                        if (!menu.contains(e.target) && e.target !== button) {
+                            menu.classList.add('hidden');
+                            document.removeEventListener('click', closeMenu);
+                        }
+                    });
+                }, 10);
+            }
+        }
+
+        function editMessage(button) {
+            const messageDiv = button.closest('.message');
+            const messageText = messageDiv.querySelector('.message-text');
+            const messageId = messageDiv.getAttribute('data-message-id');
+            const originalText = messageText.textContent;
+            
+            // Create input field
+            const inputField = document.createElement('input');
+            inputField.type = 'text';
+            inputField.value = originalText;
+            inputField.className = 'w-full bg-transparent border-b border-blue-300 focus:outline-none focus:border-blue-500';
+            
+            // Replace text with input field
+            messageText.replaceWith(inputField);
+            inputField.focus();
+            
+            // Close menu
+            const menu = messageDiv.querySelector('.message-actions');
+            if (menu) menu.classList.add('hidden');
+            
+            // Handle save on Enter or blur
+            function handleKeyPress(e) {
+                if (e.key === 'Enter') {
+                    saveEditedMessage(inputField, messageId);
+                    document.removeEventListener('click', handleOutsideClick);
+                }
+            }
+            
+            function handleOutsideClick(e) {
+                if (!inputField.contains(e.target)) {
+                    revertEdit();
+                    document.removeEventListener('click', handleOutsideClick);
+                }
+            }
+            
+            function revertEdit() {
+                const newSpan = document.createElement('span');
+                newSpan.className = 'message-text';
+                newSpan.textContent = originalText;
+                inputField.replaceWith(newSpan);
+            }
+            
+            inputField.addEventListener('keypress', handleKeyPress);
+            setTimeout(() => {
+                document.addEventListener('click', handleOutsideClick);
+            }, 10);
+        }
+        
+        function saveEditedMessage(inputField, messageId) {
+            const newText = inputField.value.trim();
+            if (newText) {
+                // Here you would typically make an AJAX call to save the edited message
+                console.log(`Saving message ${messageId}: ${newText}`);
+                
+                // For now, just update the UI
+                const newSpan = document.createElement('span');
+                newSpan.className = 'message-text';
+                newSpan.textContent = newText;
+                inputField.replaceWith(newSpan);
+            } else {
+                revertEdit();
+            }
+        }
     </script>
-
 </body>
 </html>

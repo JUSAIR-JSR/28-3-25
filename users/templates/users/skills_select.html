@@ -1,90 +1,114 @@
+{% load static tailwind_tags %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Select Skills</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Skills | Professional Profile</title>
+    {% tailwind_css %}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f7f7f7;
-            color: #333;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        h2, h3 {
-            color: #333;
-            text-align: center;
+        
+        .skill-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: fadeIn 0.5s ease forwards;
         }
-        .container {
-            max-width: 600px;
-            margin: 30px auto;
-            padding: 20px;
-            background-color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
+        
+        .skill-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
         }
-        .skill-section {
-            margin-bottom: 20px;
-        }
-        .checkbox-group {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-        }
-        .checkbox-item {
-            width: 48%;
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        .checkbox-item input {
-            margin-right: 10px;
-        }
-        .submit-button {
-            background-color: #4CAF50;
+        
+        .checkbox-input:checked + .skill-label {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            border-color: transparent;
             color: white;
-            padding: 12px 20px;
-            border: none;
-            cursor: pointer;
-            width: 100%;
-            text-align: center;
-            font-size: 16px;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
         }
-        .submit-button:hover {
-            background-color: #45a049;
+        
+        .checkbox-input:checked + .skill-label .checkmark {
+            opacity: 1;
+            transform: scale(1);
         }
-        .add-skill-link {
-            display: block;
-            margin-top: 10px;
-            text-align: center;
-            color: #007bff;
-            text-decoration: none;
+        
+        .checkmark {
+            transition: all 0.2s ease;
+            transform: scale(0.8);
+            opacity: 0;
         }
-        .add-skill-link:hover {
-            text-decoration: underline;
+        
+        .submit-btn {
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+        }
+        
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+        
+        .skill-grid {
+            animation: fadeIn 0.6s ease forwards;
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h2>Select Skills</h2>
-        <form method="POST" action="{% url 'skills_select' %}">
-            {% csrf_token %}
-            
-            <div class="skill-section">
-                <h3>Available Skills</h3>
-                <div class="checkbox-group">
-                    {% for skill in all_skills %}
-                        <label class="checkbox-item">
-                            <input type="checkbox" name="skills" value="{{ skill.id }}" {% if skill in user_skills %}checked{% endif %}>
-                            {{ skill.name }}
-                        </label>
-                    {% endfor %}
-                </div>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4 font-sans antialiased">
+    <div class="w-full max-w-4xl">
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden p-8">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">Select Your Skills</h1>
+                <p class="text-gray-600">Choose the skills that best represent your expertise</p>
             </div>
             
-            <button type="submit" class="submit-button">Save Skills</button>
-        </form>
-        <a href="{% url 'skills_add' %}" class="add-skill-link">Add New Skill</a>
+            <form method="POST" action="{% url 'skills_select' %}" class="space-y-8">
+                {% csrf_token %}
+                
+                <div class="space-y-6">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-xl font-semibold text-gray-800">Available Skills</h2>
+                        <span class="text-sm text-gray-500">{{ user_skills.count }} selected</span>
+                    </div>
+                    
+                    <div class="skill-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                        {% for skill in all_skills %}
+                        <div class="skill-card">
+                            <input type="checkbox" 
+                                   id="skill-{{ skill.id }}" 
+                                   name="skills" 
+                                   value="{{ skill.id }}" 
+                                   {% if skill in user_skills %}checked{% endif %} 
+                                   class="checkbox-input hidden">
+                            <label for="skill-{{ skill.id }}" class="skill-label cursor-pointer flex flex-col items-center justify-center p-4 border-2 border-gray-200 rounded-xl hover:border-indigo-300 transition-all">
+                                <div class="relative mb-3 w-12 h-12 bg-indigo-50 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-tools text-indigo-500 text-lg"></i>
+                                    <div class="checkmark absolute inset-0 bg-indigo-100 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-check text-white"></i>
+                                    </div>
+                                </div>
+                                <span class="text-center font-medium  ">{{ skill.name }}</span>
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <div class="flex justify-center pt-6">
+                    <button type="submit" class="submit-btn px-8 py-3 text-white font-semibold rounded-full flex items-center space-x-2">
+                        <i class="fas fa-save"></i>
+                        <span>Save Skills</span>
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </body>
 </html>

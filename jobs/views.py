@@ -382,3 +382,9 @@ def manage_interview(request, org_id, job_id, application_id, interview_id=None)
         'form': form,
         'interview': interview if interview_id else None
     })
+
+
+
+def joblist_userdashboard(request):
+    job_postings_all = JobPosting.objects.all().order_by('-posted_on')  # Ordering by latest job post
+    return render(request, 'jobs/all_joblist_user.html', {'job_postings_all': job_postings_all})

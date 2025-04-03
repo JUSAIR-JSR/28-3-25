@@ -1,0 +1,158 @@
+{% load user_filters %}
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Opportunities | Professional Network</title>
+    {% tailwind_css %}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .job-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        .job-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .skill-pill {
+            transition: all 0.2s ease;
+        }
+        
+        .skill-pill:hover {
+            transform: scale(1.05);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .apply-btn {
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            box-shadow: 0 4px 6px rgba(99, 102, 241, 0.2);
+        }
+        
+        .apply-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px rgba(99, 102, 241, 0.3);
+            background: linear-gradient(135deg, #5a5feb 0%, #7c4dff 100%);
+        }
+        
+        .detail-btn {
+            transition: all 0.3s ease;
+        }
+        
+        .detail-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-color: #f9fafb;
+        }
+        
+        .status-badge {
+            transition: all 0.2s ease;
+        }
+        
+        .status-badge:hover {
+            transform: scale(1.05);
+        }
+        
+        .job-image {
+            transition: all 0.5s ease;
+        }
+        
+        .job-card:hover .job-image {
+            transform: scale(1.03);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen p-4 md:p-6 font-sans antialiased">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for job in job_postings_all %}
+        <div class="job-card bg-white rounded-xl shadow-md overflow-hidden h-full flex flex-col">
+            {% if job.job_post_image %}
+            <div class="h-48 overflow-hidden">
+                <img class="w-full h-full object-cover job-image" src="{{ job.job_post_image.url }}" alt="{{ job.title }}">
+            </div>
+            {% endif %}
+            
+            <div class="p-6 flex-grow flex flex-col">
+                <div class="flex justify-between items-start mb-3">
+                    <h3 class="text-xl font-bold text-gray-800 leading-tight">{{ job.title }}</h3>
+                    {% if job.is_new %}
+                    <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full ml-2">
+                        New
+                    </span>
+                    {% endif %}
+                </div>
+                
+                <div class="flex items-center text-gray-600 mb-2">
+                    <i class="fas fa-building text-gray-400 mr-2 w-4 text-center"></i>
+                    <span>{{ job.organization.name }}</span>
+                </div>
+                
+                <div class="flex items-center text-gray-600 mb-4">
+                    <i class="fas fa-map-marker-alt text-gray-400 mr-2 w-4 text-center"></i>
+                    <span>{{ job.location }}</span>
+                </div>
+                
+                <p class="text-gray-700 mb-4 line-clamp-3 flex-grow">{{ job.description }}</p>
+                
+                <div class="flex items-center text-sm text-gray-500 mb-4">
+                    <i class="fas fa-clock text-gray-400 mr-2 w-4 text-center"></i>
+                    <span>Deadline: <span class="font-medium">{{ job.application_deadline|date:"M d, Y" }}</span></span>
+                </div>
+                
+                <div class="flex flex-wrap gap-2 mb-5">
+                    {% for skill in job.required_skills.all|slice:":3" %}
+                    <span class="skill-pill bg-indigo-50 text-indigo-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                        {{ skill.name }}
+                    </span>
+                    {% endfor %}
+                    {% if job.required_skills.count > 3 %}
+                    <span class="skill-pill bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                        +{{ job.required_skills.count|add:"-3" }} more
+                    </span>
+                    {% endif %}
+                </div>
+                
+                <div class="mt-auto pt-2">
+                    <div class="flex flex-wrap items-center justify-between">
+                        {% if job.id in applied_jobs %}
+                            {% with status=applied_jobs|dictkey:job.id %}
+                            <div class="flex items-center">
+                                <span class="status-badge {% if status == 'PENDING' %}bg-yellow-100 text-yellow-800{% elif status == 'ACCEPTED' %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %} text-xs font-medium px-3 py-1 rounded-full inline-flex items-center mr-3">
+                                    {% if status == 'PENDING' %}
+                                        <i class="fas fa-clock mr-1.5"></i>
+                                    {% elif status == 'ACCEPTED' %}
+                                        <i class="fas fa-check mr-1.5"></i>
+                                    {% else %}
+                                        <i class="fas fa-times mr-1.5"></i>
+                                    {% endif %}
+                                    {{ status }}
+                                </span>
+                                <a href="{% url 'job_application_detail' job.pk %}" class="text-sm font-medium text-indigo-600 hover:text-indigo-800 flex items-center">
+                                    View Application <i class="fas fa-chevron-right ml-1.5 text-xs"></i>
+                                </a>
+                            </div>
+                            {% endwith %}
+                        {% else %}
+                            <a href="{% url 'job_application_create' org_id=job.organization.id pk=job.pk %}" class="apply-btn px-4 py-2 text-white text-sm font-medium rounded-lg flex items-center mr-3">
+                                <i class="fas fa-paper-plane mr-2"></i> Apply Now
+                            </a>
+                        {% endif %}
+                       
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
